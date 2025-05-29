@@ -1,28 +1,37 @@
 /* style.css */
 :root {
-    --bg-color-darkest: #1a202c; /* Bleunuit profond */
-    --bg-color-dark: #2c3e50;  /* Gris ardoise bleuté */
-    --bg-color-medium: #34495e; /* Gris bleuté plus clair */
-    --bg-color-light: #7f8c8d; /* Gris pierre */
+    --bg-color-darkest: #1a202c; 
+    --bg-color-dark: #2c3e50;  
+    --bg-color-medium: #34495e; 
+    --bg-color-light: #7f8c8d; 
     
-    --text-color-lightest: #ecf0f1; /* Blanc cassé */
-    --text-color-light: #bdc3c7;   /* Gris clair */
-    --text-color-medium: #95a5a6;  /* Gris moyen */
+    --text-color-lightest: #ecf0f1; 
+    --text-color-light: #bdc3c7;   
+    --text-color-medium: #95a5a6;  
     --text-color-dark: #7f8c8d;    
 
-    --primary-accent: #e67e22; /* Orange carotte */
-    --secondary-accent: #2ecc71; /* Vert émeraude */
-    --danger-accent: #e74c3c;   /* Rouge alizarine */
-    --info-accent: #3498db;     /* Bleu pétrel */
+    --primary-accent: #e67e22; 
+    --secondary-accent: #2ecc71; 
+    --danger-accent: #e74c3c;   
+    --info-accent: #3498db;     
 
     --card-border-radius: 6px; 
     --popup-border-radius: 10px;
 
-    /* Card type colors */
-    --monster-color: #c0392b; /* Rouge grenade */
-    --protector-color: #27ae60; /* Vert néphrite */
-    --spell-color: #2980b9; /* Bleu Belize Hole */
-    --trap-color: #8e44ad; /* Violet améthyste */
+    --monster-color: #c0392b; 
+    --protector-color: #27ae60; 
+    --spell-color: #2980b9; 
+    --trap-color: #8e44ad; 
+
+    /* Rarity Colors */
+    --rarity-commun-color: #95a5a6;
+    --rarity-rare-color: #3498db;
+    --rarity-epique-color: #9b59b6;
+    --rarity-legendaire-color: #f1c40f;
+    --rarity-commun-glow: rgba(149, 165, 166, 0.3);
+    --rarity-rare-glow: rgba(52, 152, 219, 0.4);
+    --rarity-epique-glow: rgba(155, 89, 182, 0.5);
+    --rarity-legendaire-glow: rgba(241, 196, 15, 0.6);
 }
 
 * {
@@ -36,7 +45,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* min-height pour petits écrans */   
+    min-height: 100vh;    
     background: radial-gradient(ellipse at center, var(--bg-color-dark) 0%, var(--bg-color-darkest) 75%);
     color: var(--text-color-light);
     overflow: hidden; 
@@ -48,13 +57,13 @@ body {
     width: 100%;
     height: 100%;
     max-width: 480px; 
-    background-color: var(--bg-color-darkest); /* Fond d'écran plus sombre */
+    background-color: var(--bg-color-darkest); 
     border: 1px solid var(--bg-color-medium);
     box-shadow: 0 0 20px rgba(0,0,0,0.4);
     flex-direction: column;
     padding: 12px; 
     overflow: hidden;
-    border-radius: 8px; /* Coins arrondis pour les écrans */
+    border-radius: 8px; 
 }
 .screen.active-screen {
     display: flex;
@@ -78,8 +87,7 @@ body {
 }
 .ingame-title { margin-bottom: 6px; } 
 
-/* --- Menu Principal & Écran Booster & Deck Builder --- */
-#main-menu-screen, #booster-opening-screen, #deck-builder-screen { 
+#main-menu-screen, #deck-builder-screen { /* Booster screen a son propre style */
     justify-content: center; 
     align-items: center;
     gap: 20px; 
@@ -117,7 +125,6 @@ body {
 .menu-button:active { transform: translateY(1px); box-shadow: 0 1px 2px rgba(0,0,0,0.2), inset 0 -1px 1px rgba(0,0,0,0.1); }
 .menu-button:disabled { background-color: var(--bg-color-medium); color: var(--text-color-medium); cursor: not-allowed; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);}
 
-
 .version-info {
     position: absolute;
     bottom: 10px; 
@@ -126,7 +133,35 @@ body {
     opacity: 0.7;
 }
 
-#booster-cards-area, #deck-builder-collection-area, #deck-builder-deck-area {
+/* Styles spécifiques pour l'écran d'ouverture de booster */
+#booster-opening-screen {
+    justify-content: flex-start; /* Aligner en haut */
+    padding-top: 20px; /* Plus d'espace en haut */
+    gap: 15px; /* Espace entre titre, zone de cartes, et bouton */
+}
+
+#booster-cards-area {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center; 
+    align-items: flex-start; 
+    gap: 15px; 
+    padding: 15px;
+    background-color: rgba(0,0,0,0.2); 
+    border: 1px solid var(--bg-color-medium);
+    border-radius: var(--popup-border-radius);
+    width: 100%;
+    max-width: 95%; 
+    margin: 0 auto; 
+    min-height: 300px; 
+    max-height: 70vh; 
+    overflow-y: auto; 
+}
+#booster-cards-area > h2 { /* Cache le h2 interne s'il est généré par renderZone */
+    display: none; 
+}
+
+#deck-builder-collection-area, #deck-builder-deck-area {
     display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start;
     gap: 10px; padding: 10px; 
     background-color: rgba(0,0,0,0.15); 
@@ -135,7 +170,7 @@ body {
     width: 100%; min-height: 160px; max-height: 65vh; overflow-y: auto; 
     position: relative; 
 }
-#booster-cards-area h2, #deck-builder-collection-area h2, #deck-builder-deck-area h2 {
+#deck-builder-collection-area h2, #deck-builder-deck-area h2 {
     width:100%; margin:0 0 6px 0; font-size:0.8em; color:var(--text-color-light); 
     text-align:center; font-weight:400; padding:3px 0; background-color: rgba(0,0,0,0.25);
     border-radius: 3px;
@@ -143,37 +178,229 @@ body {
     border-bottom: 1px solid var(--bg-color-light);
 }
 
-
-/* Cartes dans booster et deck builder (grand format) */
-#booster-cards-area .card, 
+/* Styles pour cartes dans Deck Builder */
 #deck-builder-collection-area .card, 
 #deck-builder-deck-area .card { 
     width: 90px; 
-    height: 126px; 
+    height: 126px; /* Hauteur fixe pour uniformité dans le deck builder */
     cursor: pointer; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* Ombre plus prononcée */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color-medium);
+    border: 1px solid var(--bg-color-light);
+    border-radius: var(--card-border-radius);
+    padding: 4px; /* Padding interne réduit pour deck builder */
+    overflow: hidden; /* S'assurer que le contenu ne dépasse pas */
 }
-#booster-cards-area .card:hover, 
 #deck-builder-collection-area .card:hover, 
 #deck-builder-deck-area .card:hover {
     transform: translateY(-3px) scale(1.03);
     box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
 
-#booster-cards-area .card .card-description-area,
-#deck-builder-collection-area .card .card-description-area,
-#deck-builder-deck-area .card .card-description-area { 
-    display: block !important; 
-    font-size: 0.65em; 
+/* Styles pour cartes dans BOOSTER (plus grandes) */
+#booster-cards-area .card {
+    width: 120px; 
+    height: auto; 
+    min-height: 180px; 
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color-medium);
+    border: 1px solid var(--bg-color-light);
+    border-radius: var(--card-border-radius);
+    box-shadow: 0 3px 7px rgba(0,0,0,0.4);
+    padding: 5px; 
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    cursor: pointer; 
+}
+#booster-cards-area .card:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+}
+
+/* Commun pour cartes de booster et deck builder */
+#booster-cards-area .card .card-header,
+#deck-builder-collection-area .card .card-header, 
+#deck-builder-deck-area .card .card-header {
+    font-size: 0.75em; 
+    padding: 4px 3px;
+    height: auto; 
+    min-height: 30px; 
+    line-height: 1.2;
     white-space: normal; 
-    overflow-y: auto; 
-    max-height: 40px; 
-    padding: 3px;
-    line-height: 1.15;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-color-lightest);
+    background-color: rgba(0,0,0,0.2);
+}
+#booster-cards-area .card .card-header .card-name-text,
+#deck-builder-collection-area .card .card-header .card-name-text, 
+#deck-builder-deck-area .card .card-header .card-name-text {
+    white-space: normal; 
+    text-overflow: clip; 
+    overflow: visible;
+    flex-grow: 1;
+}
+#booster-cards-area .card .card-header .card-type-icon,
+#deck-builder-collection-area .card .card-header .card-type-icon, 
+#deck-builder-deck-area .card .card-header .card-type-icon {
+    font-size: 1.2em; 
+    margin-bottom: 2px; 
+    display: block; 
+    margin-right: 0; 
+}
+
+#booster-cards-area .card .card-image-container,
+#deck-builder-collection-area .card .card-image-container, 
+#deck-builder-deck-area .card .card-image-container {
+    padding: 4px;
+    margin: 5px 0;
+    height: 60px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#deck-builder-collection-area .card .card-image-container, /* Plus petit pour deck builder */
+#deck-builder-deck-area .card .card-image-container {
+    height: 45px; 
+    margin: 3px 0;
+    padding: 2px;
+}
+
+#booster-cards-area .card .card-image-area,
+#deck-builder-collection-area .card .card-image-area, 
+#deck-builder-deck-area .card .card-image-area {
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 3px;
+    background-color: rgba(0,0,0,0.3);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5em; 
+}
+#deck-builder-collection-area .card .card-image-area, /* Plus petite icone pour deck builder */
+#deck-builder-deck-area .card .card-image-area {
+    font-size: 2em;
+}
+
+
+#booster-cards-area .card .card-stats-area,
+#deck-builder-collection-area .card .card-stats-area, 
+#deck-builder-deck-area .card .card-stats-area {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 0.7em;
+    padding: 3px 0;
+    height: auto; 
+    background-color: rgba(0,0,0,0.2);
+    margin-top: 3px;
+    border-radius: 2px;
+}
+#deck-builder-collection-area .card .card-stats-area, /* Plus petit pour deck builder */
+#deck-builder-deck-area .card .card-stats-area {
+    font-size: 0.65em;
+    padding: 2px 0;
+}
+
+
+#booster-cards-area .card .stat-box,
+#deck-builder-collection-area .card .stat-box, 
+#deck-builder-deck-area .card .stat-box {
+    font-size: 1em; 
+    padding: 2px 4px;
+    background-color: transparent; 
+    border: none; 
+    flex-basis: 48%;
+    box-sizing: border-box;
+    text-align: center;
+}
+#deck-builder-collection-area .card .stat-box, /* Plus petit pour deck builder */
+#deck-builder-deck-area .card .stat-box {
+    padding: 1px 2px;
+}
+
+
+#booster-cards-area .card .card-ability-text,
+#deck-builder-collection-area .card .card-ability-text, 
+#deck-builder-deck-area .card .card-ability-text {
+    font-size: 0.65em;
+    padding: 3px 2px;
+    text-align: center;
+    min-height: 1.5em; 
+    color: var(--text-color-light);
+    font-style: italic;
+    line-height: 1.3;
+    margin-top: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#deck-builder-collection-area .card .card-ability-text, /* Plus petit pour deck builder */
+#deck-builder-deck-area .card .card-ability-text {
+    font-size: 0.6em;
+    min-height: 1.3em;
+    padding: 2px 1px;
+}
+
+
+#booster-cards-area .card .card-description-area,
+#deck-builder-collection-area .card .card-description-area, 
+#deck-builder-deck-area .card .card-description-area {
+    display: block !important; 
+    font-size: 0.6em;
+    line-height: 1.25;
+    margin-top: auto; 
+    padding: 4px 3px;
     background-color: rgba(0,0,0,0.1);
     border-top: 1px solid rgba(255,255,255,0.05);
+    max-height: 50px; 
+    overflow-y: auto;
+    color: var(--text-color-medium);
+    flex-grow: 1; 
 }
+#deck-builder-collection-area .card .card-description-area, /* Plus petite pour deck builder */
+#deck-builder-deck-area .card .card-description-area {
+    font-size: 0.55em;
+    max-height: 35px;
+    padding: 3px 2px;
+}
+
+
+/* Rareté sur les cartes de booster et deck builder */
+#booster-cards-area .card.rarity-rare,
+#deck-builder-collection-area .card.rarity-rare, 
+#deck-builder-deck-area .card.rarity-rare {
+    border-color: var(--rarity-rare-color);
+}
+#booster-cards-area .card.rarity-epique,
+#deck-builder-collection-area .card.rarity-epique, 
+#deck-builder-deck-area .card.rarity-epique {
+    border-color: var(--rarity-epique-color);
+    box-shadow: 0 3px 7px rgba(0,0,0,0.4), 0 0 5px var(--rarity-epique-glow);
+}
+#booster-cards-area .card.rarity-legendaire,
+#deck-builder-collection-area .card.rarity-legendaire, 
+#deck-builder-deck-area .card.rarity-legendaire {
+    border-color: var(--rarity-legendaire-color);
+    animation: legendary-glow-booster 2s infinite alternate; 
+}
+@keyframes legendary-glow-booster {
+    from { 
+        box-shadow: 0 3px 7px rgba(0,0,0,0.4), 0 0 3px var(--rarity-legendaire-glow);
+        border-color: var(--rarity-legendaire-color);
+    }
+    to { 
+        box-shadow: 0 5px 10px rgba(0,0,0,0.5), 0 0 8px var(--rarity-legendaire-glow), 0 0 4px var(--rarity-legendaire-color) inset;
+        border-color: color-mix(in srgb, var(--rarity-legendaire-color) 80%, white);
+    }
+}
+
+
 #deck-builder-screen .deck-builder-actions {
     gap: 8px; 
     padding-top: 12px; 
@@ -183,14 +410,39 @@ body {
     max-width: 280px;
 }
 
+/* --- PLATEAU DE JEU --- */
+/* ... (Copiez ici tous les styles de #game-board et ses enfants depuis le message précédent) ... */
+/* ... (Incluant .card en jeu, .goal-card, .player-section, .area, #controls, etc.) ... */
+/* ... (Et les styles de rareté spécifiques pour les cartes en jeu si différents) ... */
 
-/* --- Plateau de Jeu (#game-board) --- */
+/* --- Styles pour la Rareté en jeu (si différents) --- */
+#game-board .card.rarity-rare .card-header {
+    box-shadow: inset 0 -2px 0 var(--rarity-rare-color), 0 1px 2px rgba(0,0,0,0.1);
+}
+#game-board .card.rarity-epique .card-header {
+    box-shadow: inset 0 -2px 0 var(--rarity-epique-color), 0 1px 2px rgba(0,0,0,0.1);
+}
+#game-board .card.rarity-legendaire {
+    animation: legendary-glow 2s infinite alternate; /* Animation globale pour légendaire */
+}
+#game-board .card.rarity-legendaire .card-header {
+    color: #fff; 
+    text-shadow: 0 0 3px black, 0 0 5px var(--rarity-legendaire-color);
+    box-shadow: inset 0 -2px 0 var(--rarity-legendaire-color), 0 1px 2px rgba(0,0,0,0.1);
+}
+
+@keyframes legendary-glow { /* Peut être la même que legendary-glow-booster ou légèrement différente */
+    from { box-shadow: 0 0 3px rgba(0,0,0,0.6), 0 0 2px var(--rarity-legendaire-glow), 1px 1px 3px rgba(0,0,0,0.6); }
+    to { box-shadow: 0 0 6px rgba(0,0,0,0.7), 0 0 5px var(--rarity-legendaire-glow), 0 0 2px var(--rarity-legendaire-color) inset, 1px 1px 3px rgba(0,0,0,0.6); }
+}
+
+/* ... (styles de #game-board .card, .goal-card, etc. copiés ici) ... */
 #game-board {
-    background-color: var(--bg-color-dark); /* Légèrement plus clair que l'écran pour contraste */
+    background-color: var(--bg-color-dark); 
     justify-content: space-between;
     padding: 5px; 
-    border-radius: 0; /* Pas de radius pour le game-board lui-même */
-    box-shadow: none; /* Pas de shadow pour le game-board lui-même */
+    border-radius: 0; 
+    box-shadow: none; 
     border: none;
 }
 .game-layout {
@@ -233,7 +485,7 @@ body {
     padding:4px; 
     width:100%; 
     box-sizing:border-box; 
-    background-color: rgba(0,0,0,0.2); /* Fond des zones plus transparent */
+    background-color: rgba(0,0,0,0.2); 
     border-radius:5px; 
     display:flex; 
     flex-wrap:wrap; 
@@ -258,7 +510,6 @@ body {
     opacity: 0.8;
 }
 
-/* Hauteurs des zones en jeu - Mobile Vertical */
 .opponent-goals, .player-goals { min-height: 50px; max-height: 12vh; } 
 .opponent-hand  { 
     min-height: 18px; 
@@ -269,9 +520,7 @@ body {
     overflow: hidden; 
 }
 .opponent-field, .player-field { min-height: 65px; max-height: 18vh; } 
-
 .player-hand    { min-height: 70px; max-height: 18vh; align-items: flex-end; padding-bottom:2px; } 
-
 
 #controls {
     height: 7vh; 
@@ -297,75 +546,74 @@ body {
     padding: 0 5px; 
 }
 
-/* --- ICONES DE TYPE DE CARTE --- */
 .card-type-icon {
-    margin-right: 3px; /* Espace entre icône et nom */
-    font-size: 0.9em; /* Ajuster la taille de l'icône si besoin */
+    margin-right: 3px; 
+    font-size: 0.9em; 
     line-height: 1;
     display: inline-block;
     vertical-align: middle;
 }
-.card-header .card-type-icon {
-    font-size: 1.1em; /* Icônes un peu plus grandes dans le header de carte */
+#game-board .card-header .card-type-icon { /* Spécifique aux cartes en jeu si besoin de taille différente */
+    font-size: 1.1em; 
 }
 .icon-monster::before   { content: '🐲'; color: var(--monster-color); }
-.icon-protector::before { content: '🛡️'; color: var(--protector-color); } /* Bouclier */
-.icon-spell::before     { content: '✨'; color: var(--spell-color); } /* Étincelles pour magie */
-.icon-trap::before      { content: '🕸️'; color: var(--trap-color); } /* Toile pour piège */
+.icon-protector::before { content: '🛡️'; color: var(--protector-color); } 
+.icon-spell::before     { content: '✨'; color: var(--spell-color); } 
+.icon-trap::before      { content: '🕸️'; color: var(--trap-color); } 
 
-/* Pour les objectifs IA cachés, on peut rendre l'icône plus neutre */
 .goal-image .hidden-goal-icon::before {
     opacity: 0.7;
     filter: grayscale(50%);
 }
 
-
-/* --- CARTES EN JEU (Mobile First Design) --- */
 #game-board .card, #game-board .card-placeholder, #game-board .goal-card {
-    width: 42px;  /* Légèrement augmenté pour lisibilité icone */
-    height: 60px; /* Légèrement augmenté */
+    width: 42px;  
+    height: 60px; 
     border-radius:3px; 
     box-shadow:1px 1px 3px rgba(0,0,0,0.6); 
-    background-color: var(--bg-color-medium); /* Fond de carte */
+    background-color: var(--bg-color-medium); 
     border: 1px solid var(--bg-color-light);
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Pour que le contenu ne dépasse pas */
+    overflow: hidden; 
 }
 #game-board .card-header {
-    font-size:0.4em; /* Très petit pour nom + icone */
-    min-height: auto; /* Laisser le contenu dicter */
-    height: 14px; /* Hauteur fixe pour header */
+    font-size:0.4em; 
+    height: 14px; 
     line-height: 1; 
-    white-space: nowrap; /* Eviter retour à la ligne du nom */
+    white-space: nowrap; 
     overflow: hidden; 
-    text-overflow: ellipsis; /* ... si nom trop long */
+    text-overflow: ellipsis; 
     padding: 1px 2px; 
     display:flex; align-items:center; justify-content:center;
     background-color: rgba(0,0,0,0.2);
     color: var(--text-color-lightest);
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: relative; 
 }
-.card-header .card-name-text {
+#game-board .card-header .card-name-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex-grow: 1; /* Permet au nom de prendre l'espace restant */
+    flex-grow: 1; 
     text-align: center;
 }
 
-#game-board .card-image-area {
-    height:22px; 
-    margin: 1px; 
-    /* background-color: rgba(0,0,0,0.1);  Optionnel: fond pour image area */
-    border-radius: 1px;
-    display: flex;      
-    align-items: center; 
-    justify-content: center; 
-    color: var(--text-color-lightest); 
-    flex-grow: 1; /* Prend l'espace restant */
+#game-board .card-image-container {
+    padding: 2px; 
+    margin: 1px;
+    flex-grow: 1;
+    display: flex; 
 }
-
+#game-board .card-image-area {
+    border: 1px solid rgba(255,255,255,0.15); 
+    border-radius: 2px; 
+    background-color: rgba(0,0,0,0.2); 
+    width: 100%; 
+    height: 100%; 
+    margin: 0; 
+    display: flex; align-items: center; justify-content: center;
+}
 
 #game-board .goal-card .card-image-area.goal-image span { 
     font-size: 2em; 
@@ -374,14 +622,30 @@ body {
 
 #game-board .card-stats-area { 
     font-size:0.45em; 
-    padding: 1px; 
+    padding: 0 1px; 
     background-color: rgba(0,0,0,0.15);
     text-align: center;
-    height: 10px; /* Hauteur fixe pour stats */
-    line-height: 8px; /* Centrer verticalement */
+    height: 10px; 
+    line-height: 8px; 
     color: var(--text-color-light);
+    display: flex; 
+    justify-content: space-around; 
+    align-items: center;
 }
-#game-board .card-stats-area span { padding: 0 2px; } 
+#game-board .stat-box { /* Renommé .stat-box pour #game-board aussi */
+    background-color: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 2px;
+    padding: 0px 2px; 
+    font-size: 0.9em; 
+    line-height: 1; 
+    text-align: center;
+    flex-basis: 48%; 
+    box-sizing: border-box;
+}
+#game-board .atk-box { color: #ffdddd; }
+#game-board .def-box { color: #ddeeff; }
+
 
 #game-board .card-ability-text { 
     font-size:0.4em; 
@@ -390,14 +654,13 @@ body {
     text-align: center;
     color: var(--text-color-medium);
     padding: 1px;
-    height: 8px; /* Hauteur fixe pour abilities */
+    height: 8px; 
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 #game-board .card-description-area { display:none; } 
 
-/* Main IA placeholders */
 #opponent-hand-area .card-placeholder {
     width: 34px; 
     height: 48px; 
@@ -407,9 +670,8 @@ body {
     border: 1px solid var(--bg-color-medium);
 }
 
-/* Styles spécifiques pour les cartes dans la main du joueur */
 #player-hand-area .card { 
-    margin:0 -25px 0 0; /* Adapté */
+    margin:0 -25px 0 0; 
     box-shadow: 0 2px 4px rgba(0,0,0,0.4);
     transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 }
@@ -420,18 +682,16 @@ body {
     z-index: 10; 
 }
 
-/* Style pour carte sélectionnée par le joueur */
 #player-field-area .card.selected { 
     border:2px solid var(--info-accent); 
     box-shadow:0 0 8px var(--info-accent),0 0 3px var(--info-accent) inset, 1px 1px 3px rgba(0,0,0,0.6); 
     transform:scale(1.12) translateY(-2px); 
 }
-/* Style pour les cibles potentielles */
 #game-board .card.targetable, #game-board .goal-card.targetable {
     outline: 1.5px dashed var(--danger-accent); 
-    outline-offset: 2px; /* Plus d'espace */
+    outline-offset: 2px; 
     cursor: crosshair; 
-    border-color: transparent !important; /* Cacher la bordure normale pour que l'outline soit plus clair */
+    border-color: transparent !important; 
 }
 #game-board .card.targetable:hover, #game-board .goal-card.targetable:hover:not(.revealed) {
     box-shadow:0 0 8px var(--danger-accent), 0 0 3px var(--danger-accent) inset, 1px 1px 3px rgba(0,0,0,0.6);
@@ -442,12 +702,12 @@ body {
 .player-card { border-left: 2px solid var(--info-accent); } 
 .opponent-card { border-left: 2px solid var(--danger-accent); }
 .card.is-protector .card-header { background-color: var(--protector-color); color: white;}
-.card.is-protector .card-image-area{box-shadow:0 0 5px var(--protector-color),0 0 2px var(--protector-color) inset;}
+.card.is-protector .card-image-container{box-shadow:0 0 5px var(--protector-color),0 0 2px var(--protector-color) inset;}
 .card.is-protector::before{content:"";position:absolute;top:-1px;left:-1px;right:-1px;bottom:-1px;border-radius:3px;border:1px dashed rgba(var(--protector-color),0.6);animation:rotate-aura 20s linear infinite;pointer-events:none;} @keyframes rotate-aura{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
-.card.is-frozen{opacity:0.75!important;}.card.is-frozen .card-image-area{filter:grayscale(70%) contrast(80%) brightness(0.9);}
+.card.is-frozen{opacity:0.75!important;}.card.is-frozen .card-image-container{filter:grayscale(70%) contrast(80%) brightness(0.9);}
 .card.is-frozen::after{content:"❄️"; position:absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2em; opacity:0.6; pointer-events:none; text-shadow: 0 0 3px white;}
-.card.playable{animation:pulse-glow 1.3s infinite ease-in-out;} @keyframes pulse-glow{0%,100%{box-shadow:1px 1px 3px rgba(0,0,0,0.6),0 0 3px var(--primary-accent);}50%{box-shadow:1px 1px 3px rgba(0,0,0,0.6),0 0 8px var(--primary-accent),0 0 4px var(--primary-accent) inset;}}
+.card.playable{animation:pulse-playable 1.3s infinite ease-in-out;} @keyframes pulse-playable{0%,100%{box-shadow:1px 1px 3px rgba(0,0,0,0.6),0 0 3px var(--primary-accent);}50%{box-shadow:1px 1px 3px rgba(0,0,0,0.6),0 0 8px var(--primary-accent),0 0 4px var(--primary-accent) inset;}}
 
 .card-placeholder { background-color:var(--bg-color-dark); border:1px solid var(--bg-color-darkest); display:flex; align-items:center; justify-content:center; background-image: linear-gradient(45deg, var(--bg-color-darkest) 25%, transparent 25%), linear-gradient(-45deg, var(--bg-color-darkest) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--bg-color-darkest) 75%), linear-gradient(-45deg, transparent 75%, var(--bg-color-darkest) 75%); background-size:8px 8px; background-position:0 0,0 4px,4px -4px,-4px 0px;} 
 .goal-card { 
@@ -456,16 +716,13 @@ body {
     color: var(--text-color-lightest); 
     font-weight:600; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; 
 }
-.goal-card.revealed { 
-    /* background-color:#dd6b20!important;  Utiliser la couleur du type à la place */
-    /* border-color:#9c4221!important; */
-    color:var(--text-color-lightest); 
-}
 .goal-card.revealed.icon-spell { background-color: var(--spell-color) !important; border-color: color-mix(in srgb, var(--spell-color) 70%, black) !important; }
 .goal-card.revealed.icon-trap { background-color: var(--trap-color) !important; border-color: color-mix(in srgb, var(--trap-color) 70%, black) !important; }
+.goal-card.revealed.icon-monster { background-color: var(--monster-color) !important; border-color: color-mix(in srgb, var(--monster-color) 70%, black) !important;}
+
 
 .goal-card .goal-header {
-    font-size: 0.45em; /* Plus petit pour les objectifs */
+    font-size: 0.45em; 
     height: auto;
     padding: 2px;
 }
@@ -474,15 +731,14 @@ body {
 .goal-card.destroyed { background-color:var(--bg-color-dark)!important; border-color:var(--bg-color-darkest)!important; color:var(--text-color-medium)!important; cursor:default; opacity: 0.7;}
 .goal-card.destroyed .goal-destroyed-text { font-size:0.5em;color:var(--text-color-medium);padding:3px;} 
 
-
 /* --- POPUP D'INFO --- */
 #card-info-popup {
-    position:fixed; bottom:0; left:0; right:0; width:auto; margin: 0 5px 5px 5px; /* Marge pour ne pas coller au bord */
-    max-height:50vh; background-color:rgba(var(--bg-color-darkest),0.97); /* Plus opaque */
+    position:fixed; bottom:0; left:0; right:0; width:auto; margin: 0 5px 5px 5px; 
+    max-height:50vh; background-color:rgba(var(--bg-color-darkest),0.97); 
     padding:12px; box-sizing:border-box; z-index:10001; color:var(--text-color-light); 
     border-top:3px solid var(--primary-accent); 
     display:none; flex-direction:column; box-shadow:0 -4px 15px rgba(0,0,0,0.5); overflow-y:auto; font-size:0.9em; 
-    border-radius: var(--popup-border-radius) var(--popup-border-radius) 0 0; /* Arrondis en haut */
+    border-radius: var(--popup-border-radius) var(--popup-border-radius) 0 0; 
 }
 #card-info-popup #close-popup-button{position:absolute;top:8px;right:10px;background:0 0;border:0;color:var(--text-color-medium);font-size:1.8em;line-height:1;cursor:pointer;padding:0;} 
 #card-info-popup #close-popup-button:hover{color:var(--text-color-lightest);}
@@ -494,9 +750,7 @@ body {
 .popup-actions{margin-top:10px;text-align:center;}
 .popup-actions .menu-button{font-size:0.9em;padding:6px 10px;}
 
-
-/* --- ANIMATIONS GLOBALES & CARTES --- */
-/* ... (animations existantes, peuvent être gardées ou ajustées si besoin) ... */
+/* --- ANIMATIONS --- */
 @keyframes screen-shake-heavy{0%,100%{transform:translate(0,0)}10%,30%,50%,70%,90%{transform:translate(-4px,-1px) rotate(-.3deg)}20%,40%,60%,80%{transform:translate(4px,1px) rotate(.3deg)}} 
 @keyframes screen-shake-light{0%,100%{transform:translate(0,0)}25%,75%{transform:translate(-1px,0px) rotate(-.1deg)}50%{transform:translate(1px,0px) rotate(.1deg)}} 
 .animate-screen-shake-heavy{animation:screen-shake-heavy .3s cubic-bezier(.36,.07,.19,.97) both;} 
@@ -515,8 +769,7 @@ body {
 .animate-attack-opponent{animation:attack-lunge-opponent .4s ease-out;z-index:100;}
 .animate-destroy{animation:fade-out-and-remove .5s forwards;pointer-events:none;}
 
-
-/* Media Query pour écrans très petits ou basse résolution verticale */
+/* --- MEDIA QUERIES --- */
 @media (max-height: 580px) { 
     .opponent-goals, .player-goals { max-height: 11vh; min-height: 45px; }
     .opponent-hand { max-height: 4.5vh; min-height: 18px; } 
@@ -531,10 +784,23 @@ body {
     #game-board .card-header { font-size: 0.38em; height: 12px;}
     #game-board .card-stats-area { font-size: 0.42em; height: 9px; line-height: 7px;}
     #game-board .card-ability-text { font-size: 0.38em; height: 7px;}
-    #game-board .card-image-area { height: 20px; }
+    #game-board .card-image-container { padding: 1px; margin: 1px 1px 0 1px; }
+    #game-board .card-image-area { border-radius: 1px; }
+    
+    /* Booster cartes pour petits écrans */
+    #booster-cards-area .card {
+        width: 100px; 
+        min-height: 150px;
+    }
+    #booster-cards-area .card .card-header { font-size: 0.7em; min-height: 26px;}
+    #booster-cards-area .card .card-image-container { height: 50px; }
+    #booster-cards-area .card .card-image-area { font-size: 2em; }
+    #booster-cards-area .card .card-stats-area { font-size: 0.65em; }
+    #booster-cards-area .card .card-ability-text { font-size: 0.6em; }
+    #booster-cards-area .card .card-description-area { font-size: 0.55em; max-height: 40px;}
+
 }
 
-/* Styles pour Desktop (min-width: 769px) */
 @media (min-width: 769px) {
     body { font-size: 16px; } 
     .screen { max-width: 720px; padding: 20px; border-radius: 12px;} 
@@ -544,18 +810,44 @@ body {
 
     .menu-button { padding: 14px 20px; font-size: 1.1em; }
 
-    #booster-cards-area .card, 
+    #booster-cards-area { /* Booster sur desktop */
+        gap: 20px;
+        padding: 20px;
+        max-width: 80%; 
+    }
+    #booster-cards-area .card {
+        width: 140px; 
+        min-height: 210px;
+        padding: 8px;
+    }
+    #booster-cards-area .card .card-header { font-size: 0.85em; min-height: 36px; }
+    #booster-cards-area .card .card-image-container { height: 70px; margin: 8px 0; }
+    #booster-cards-area .card .card-image-area { font-size: 3em; }
+    #booster-cards-area .card .card-stats-area { font-size: 0.8em; padding: 4px 0; }
+    #booster-cards-area .card .card-ability-text { font-size: 0.75em; min-height: 1.8em; }
+    #booster-cards-area .card .card-description-area { font-size: 0.7em; max-height: 60px;}
+
+
     #deck-builder-collection-area .card, 
     #deck-builder-deck-area .card {
         width: 105px; 
         height: 147px; 
     }
-     #booster-cards-area .card .card-description-area,
      #deck-builder-collection-area .card .card-description-area,
      #deck-builder-deck-area .card .card-description-area {
         font-size: 0.7em; 
         max-height: 48px;
     }
+    #deck-builder-collection-area .card .card-image-container, 
+    #deck-builder-deck-area .card .card-image-container {
+        height: 60px; 
+    }
+    #deck-builder-collection-area .card .card-stats-area, 
+    #deck-builder-deck-area .card .card-stats-area {
+        font-size: 0.7em;
+        padding: 3px 0;
+    }
+
 
     #game-board { max-width: 950px; padding: 15px; gap: 5px;} 
     .player-section { gap: 5px; }
@@ -579,7 +871,6 @@ body {
     #controls { height: auto; min-height: 65px; padding: 12px; margin-top: 10px; gap: 12px; border-radius: 6px;}
     #controls button, #deck-area { font-size: 1em; }
 
-
     #game-board .card, #game-board .card-placeholder, #game-board .goal-card {
         width: 90px; 
         height: 126px; 
@@ -590,22 +881,34 @@ body {
         height: 24px; 
         padding: 3px;
     }
-     .card-header .card-type-icon { font-size: 1em; }
-    #game-board .card-image-area { 
-        height: 50px; 
-        margin: 2px 3px;
+     #game-board .card-header .card-type-icon { font-size: 1em; }
+    
+    #game-board .card-image-container {
+        padding: 3px;
+        margin: 2px;
     }
+    #game-board .card-image-area {
+        border-width: 1px;
+        border-radius: 3px;
+    }
+    
     #game-board .card-stats-area { 
         font-size: 0.7em; 
         height: 18px;
         line-height: 16px;
-        padding: 2px 3px;
+        padding: 1px 2px;
     } 
+    #game-board .stat-box {
+        padding: 1px 3px;
+        font-size: 0.9em; 
+        border-radius: 3px;
+    }
+    
     #game-board .card-ability-text { 
         font-size: 0.6em; 
         height: 14px;
     } 
-    #game-board .card-description-area { /* Affichée sur desktop si on veut */
+    #game-board .card-description-area { 
         display: block !important; 
         font-size: 0.55em; 
         min-height: 2.2em; 
@@ -637,6 +940,14 @@ body {
     }
     #card-info-popup #popup-card-name { font-size: 1.4em; }
     #card-info-popup #popup-card-description { font-size: 1.05em; }
+
+    .card.rarity-legendaire { /* Animation spécifique pour desktop si besoin */
+        /* animation: legendary-glow-desktop 1.8s infinite alternate;  */
+    }
+    /* @keyframes legendary-glow-desktop { 
+        from { box-shadow: 0 0 4px rgba(0,0,0,0.6), 0 0 3px var(--rarity-legendaire-glow), 1px 1px 3px rgba(0,0,0,0.6); }
+        to { box-shadow: 0 0 8px rgba(0,0,0,0.7), 0 0 7px var(--rarity-legendaire-glow), 0 0 3px var(--rarity-legendaire-color) inset, 1px 1px 3px rgba(0,0,0,0.6); }
+    } */
 }
 
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -649,12 +960,11 @@ body {
 #deck-builder-collection-area .card .card-description-area, 
 #deck-builder-deck-area .card .card-description-area,
 #deck-builder-collection-area, #deck-builder-deck-area,
-#game-board .card-description-area { /* Si affichée */
+#game-board .card-description-area { 
     scrollbar-width: thin; 
     scrollbar-color: var(--bg-color-light) rgba(0,0,0,0.15); 
 }
 
-/* Classes utilitaires pour texte (optionnel) */
 .empty-zone-text {
     font-size:0.7em; 
     color:var(--text-color-medium);

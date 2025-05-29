@@ -16,7 +16,7 @@
             <button id="deck-builder-button" class="menu-button secondary-action">Éditeur de Deck</button>
             <button id="open-booster-button" class="menu-button secondary-action">Ouvrir un Booster</button>
         </div>
-        <div class="version-info">v0.3 Alpha</div> <!-- Mise à jour version indicative -->
+        <div class="version-info">v0.3 Alpha</div>
     </div>
 
     <!-- Écran d'Ouverture de Booster -->
@@ -24,8 +24,7 @@
         <button id="back-to-menu-from-booster-button" class="menu-button back-button">&larr; Menu</button>
         <h2 class="screen-title">Contenu du Booster</h2>
         <div id="booster-cards-area" class="area card-display-area">
-            <h2>Contenu du Booster</h2> <!-- Titre peut être ici ou dans le JS qui remplit -->
-            <!-- Les cartes du booster seront injectées ici par JavaScript -->
+            <h2>Contenu du Booster</h2>
         </div>
         <button id="open-another-booster-button" class="menu-button secondary-action">Ouvrir un Autre</button>
     </div>
@@ -46,7 +45,6 @@
                 <h2>Mon Deck Actuel</h2>
             </div>
         </div>
-        <!-- Zone pour les boutons d'action du Deck Builder -->
         <div class="deck-builder-actions" style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top:auto; padding-top: 15px; width: 100%;">
             <button id="deck-builder-auto-button" class="menu-button secondary-action" style="width: 85%; max-width: 300px;">Deck Auto (20)</button>
             <button id="deck-builder-save-button" class="menu-button primary-action" style="width: 85%; max-width: 300px;">Sauvegarder Deck</button>
@@ -92,26 +90,23 @@
         <div id="game-message-area"><p id="game-message"></p></div>
     </div>
 
-    <!-- Overlay pour l'effet d'impact visuel -->
     <div id="impact-flash-overlay"><div id="impact-visual"></div></div>
 
-    <!-- Popup pour les informations détaillées de la carte -->
     <div id="card-info-popup" class="screen"> 
         <button id="close-popup-button" aria-label="Fermer les détails">&times;</button>
         <div id="popup-card-name">Nom de la Carte</div>
         <div id="popup-card-type-cost">
             <span id="popup-card-type">Type: Monstre</span>
-            <span id="popup-card-cost" style="display:none;">Coût: 3</span>
+            <span id="popup-card-cost" style="display:none;">Coût: 3</span> {/* Assurez-vous que cet ID est utilisé par JS */}
         </div>
         <div id="popup-card-stats" style="display:none;">ATK: 10 / DEF: 5</div>
-        <div id="popup-card-abilities">Capacités: Protecteur</div>
+        <div id="popup-card-abilities">Capacités: Protecteur (Rareté: Commun)</div> {/* La rareté est maintenant gérée dynamiquement par JS */}
         <div id="popup-card-description" class="custom-scrollbar">Description complète...</div>
         <div class="popup-actions">
-            <button id="play-card-from-popup-button" class="menu-button primary-action" style="display:none;">Jouer Carte</button>
+            {/* Le bouton Jouer est ajouté dynamiquement par JS */}
         </div>
     </div>
 
-    <!-- Scripts Modulaires -->
     <script type="module" src="utils.js"></script>
     <script type="module" src="cardManager.js"></script>
     <script type="module" src="deckBuilder.js"></script>

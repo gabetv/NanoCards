@@ -5,7 +5,8 @@
     "type": "Monstre",
     "atk": 18,
     "def": 12,
-    "description": "Un jeune dragon cracheur de feu."
+    "description": "Un jeune dragon cracheur de feu.",
+    "rarity": "Rare"
   },
   {
     "id": "m002",
@@ -14,7 +15,8 @@
     "atk": 10,
     "def": 20,
     "description": "Un soldat loyal avec une armure épaisse. Bloque les attaques vers les objectifs.",
-    "abilities": ["PROTECTOR"]
+    "abilities": ["PROTECTOR"],
+    "rarity": "Commun"
   },
   {
     "id": "m003",
@@ -22,7 +24,8 @@
     "type": "Monstre",
     "atk": 15,
     "def": 8,
-    "description": "Précis et mortel à distance."
+    "description": "Précis et mortel à distance.",
+    "rarity": "Commun"
   },
   {
     "id": "m004",
@@ -31,7 +34,8 @@
     "atk": 8,
     "def": 22,
     "description": "Une forteresse mobile. Bloque les attaques vers les objectifs.",
-    "abilities": ["PROTECTOR"]
+    "abilities": ["PROTECTOR"],
+    "rarity": "Rare"
   },
   {
     "id": "m005",
@@ -39,7 +43,8 @@
     "type": "Monstre",
     "atk": 12,
     "def": 6,
-    "description": "Rapide et difficile à attraper."
+    "description": "Rapide et difficile à attraper.",
+    "rarity": "Commun"
   },
   {
     "id": "m006",
@@ -48,7 +53,8 @@
     "atk": 7,
     "def": 18,
     "description": "Un gardien immobile mais résistant. Bloque les attaques vers les objectifs.",
-    "abilities": ["PROTECTOR"]
+    "abilities": ["PROTECTOR"],
+    "rarity": "Commun"
   },
   {
     "id": "m007",
@@ -56,62 +62,71 @@
     "type": "Monstre",
     "atk": 20,
     "def": 10,
-    "description": "Une créature féroce et imprévisible."
+    "description": "Une créature féroce et imprévisible.",
+    "rarity": "Épique"
   },
   {
     "id": "s001",
     "name": "Piège Explosif",
     "type": "Piege",
     "description": "Lorsqu'il est détruit : Détruit le monstre attaquant.",
-    "effectOnDestroy": "DESTROY_ATTACKER"
+    "effectOnDestroy": "DESTROY_ATTACKER",
+    "rarity": "Rare"
   },
   {
     "id": "s002",
     "name": "Sape d'Énergie",
     "type": "Piege",
     "description": "Lorsqu'il est détruit : Le propriétaire du monstre attaquant défausse une carte aléatoire de sa main.",
-    "effectOnDestroy": "OPPONENT_DISCARD_RANDOM"
+    "effectOnDestroy": "OPPONENT_DISCARD_RANDOM",
+    "rarity": "Commun"
   },
   {
     "id": "s003",
     "name": "Renfort Inattendu",
     "type": "Magie",
     "description": "Lorsqu'elle est détruite : Vous piochez une carte.",
-    "effectOnDestroy": "OWNER_DRAW_CARD"
+    "effectOnDestroy": "OWNER_DRAW_CARD",
+    "rarity": "Commun"
   },
   {
     "id": "s004",
     "name": "Toucher Glacial",
     "type": "Magie",
     "description": "Lorsqu'elle est détruite : Réduit l'ATK d'un monstre aléatoire de l'attaquant de 5 points.",
-    "effectOnDestroy": "REDUCE_ATTACKER_MONSTER_ATK_5"
+    "effectOnDestroy": "REDUCE_ATTACKER_MONSTER_ATK_5",
+    "rarity": "Rare"
   },
   {
     "id": "s005",
     "name": "Cri de Guerre",
     "type": "Piege",
     "description": "Lorsqu'elle est détruite : Augmente l'ATK d'un de vos monstres aléatoires de 5 points.",
-    "effectOnDestroy": "BUFF_OWN_MONSTER_ATK_5"
+    "effectOnDestroy": "BUFF_OWN_MONSTER_ATK_5",
+    "rarity": "Épique"
   },
   {
     "id": "s006",
     "name": "Vent Repoussant",
     "type": "Magie",
     "description": "Lorsqu'elle est détruite : Le monstre attaquant est renvoyé dans la main de son propriétaire.",
-    "effectOnDestroy": "RETURN_ATTACKER_TO_HAND"
+    "effectOnDestroy": "RETURN_ATTACKER_TO_HAND",
+    "rarity": "Rare"
   },
   {
     "id": "s007",
     "name": "Aura de Lenteur",
     "type": "Piege",
     "description": "Lorsqu'elle est détruite : Le monstre attaquant ne peut pas attaquer au prochain tour de son propriétaire.",
-    "effectOnDestroy": "FREEZE_ATTACKER_NEXT_TURN"
+    "effectOnDestroy": "FREEZE_ATTACKER_NEXT_TURN",
+    "rarity": "Commun"
   },
   {
     "id": "s008",
     "name": "Appel aux Armes",
     "type": "Magie",
     "description": "Lorsqu'elle est détruite : Vous pouvez invoquer spécialement un monstre de votre main avec ATK <= 10.",
-    "effectOnDestroy": "SPECIAL_SUMMON_FROM_HAND_ATK_10"
+    "effectOnDestroy": "SPECIAL_SUMMON_FROM_HAND_ATK_10",
+    "rarity": "Légendaire"
   }
 ]

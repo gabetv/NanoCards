@@ -22,12 +22,11 @@ const impactFlashOverlayElement = document.getElementById('impact-flash-overlay'
 
 const cardInfoPopupElement = document.getElementById('card-info-popup');
 const popupCardNameElement = document.getElementById('popup-card-name');
-const popupCardTypeElement = document.getElementById('popup-card-type-cost'); // Div contenant type et coût
+const popupCardTypeElement = document.getElementById('popup-card-type-cost');
 const popupCardStatsElement = document.getElementById('popup-card-stats');
 const popupCardAbilitiesElement = document.getElementById('popup-card-abilities');
 const popupCardDescriptionElement = document.getElementById('popup-card-description');
 const closePopupButtonElement = document.getElementById('close-popup-button');
-// const playCardFromPopupButton = document.getElementById('play-card-from-popup-button'); // On va le recréer dynamiquement
 
 
 // --- Gestion de l'Affichage des Écrans ---
@@ -57,7 +56,6 @@ export function showCardInfo(cardInstance, canPlayFromPopup = false, playActionC
 
     popupCardNameElement.textContent = cardInstance.name;
     
-    // Mise à jour type et coût
     const typeSpan = popupCardTypeElement.querySelector('#popup-card-type');
     const costSpan = popupCardTypeElement.querySelector('#popup-card-cost');
     if (typeSpan) typeSpan.textContent = `Type: ${cardInstance.type}`;
@@ -66,7 +64,6 @@ export function showCardInfo(cardInstance, canPlayFromPopup = false, playActionC
         if (cardInstance.cost !== undefined) costSpan.textContent = `Coût: ${cardInstance.cost}`;
     }
 
-
     if (cardInstance.type === "Monstre") {
         popupCardStatsElement.textContent = `ATK: ${cardInstance.atk} / DEF: ${cardInstance.def}`;
         popupCardStatsElement.style.display = 'block';
@@ -74,21 +71,21 @@ export function showCardInfo(cardInstance, canPlayFromPopup = false, playActionC
         popupCardStatsElement.style.display = 'none';
     }
 
-    popupCardAbilitiesElement.textContent = (cardInstance.abilities && cardInstance.abilities.length > 0)
-        ? `Capacités: ${cardInstance.abilities.join(', ')}`
-        : "Aucune capacité spéciale.";
-    if (cardInstance.type !== "Monstre" && (!cardInstance.abilities || cardInstance.abilities.length === 0)) {
-        popupCardAbilitiesElement.style.display = 'none'; // Cache la ligne capacité si pas de monstre et pas d'abilities
-    } else {
-        popupCardAbilitiesElement.style.display = 'block';
+    // Affichage de la rareté dans la popup
+    const rarityText = cardInstance.rarity ? `Rareté: ${cardInstance.rarity}` : "Rareté: Commun";
+    let abilitiesText = "";
+    if (cardInstance.abilities && cardInstance.abilities.length > 0) {
+        abilitiesText = `Capacités: ${cardInstance.abilities.join(', ')} `;
     }
-
+    
+    popupCardAbilitiesElement.textContent = `${abilitiesText}(${rarityText})`;
+    popupCardAbilitiesElement.style.display = 'block'; // Toujours afficher la rareté
 
     popupCardDescriptionElement.textContent = cardInstance.description || "Pas de description.";
 
     const popupActionsDiv = cardInfoPopupElement.querySelector('.popup-actions');
     if (!popupActionsDiv) return;
-    popupActionsDiv.innerHTML = ''; // Nettoyer les anciens boutons
+    popupActionsDiv.innerHTML = ''; 
 
     if (canPlayFromPopup) {
         const playButton = document.createElement('button');
@@ -108,7 +105,7 @@ export function showCardInfo(cardInstance, canPlayFromPopup = false, playActionC
 export function hideCardInfo() {
     if (cardInfoPopupElement) cardInfoPopupElement.style.display = 'none';
     const popupActionsDiv = cardInfoPopupElement.querySelector('.popup-actions');
-    if (popupActionsDiv) popupActionsDiv.innerHTML = ''; // Nettoyer les boutons
+    if (popupActionsDiv) popupActionsDiv.innerHTML = '';
 }
 
 if (closePopupButtonElement) {
@@ -120,6 +117,13 @@ if (closePopupButtonElement) {
 export function createCardDOMElement({ cardInstance, owner, location, gameState, actions }) {
     const cardDiv = document.createElement('div');
     cardDiv.dataset.instanceId = cardInstance.instanceId;
+
+    if (cardInstance.rarity) {
+        const rarityClass = `rarity-${cardInstance.rarity.toLowerCase().replace(/\s+/g, '-')}`;
+        cardDiv.classList.add(rarityClass);
+    } else {
+        cardDiv.classList.add('rarity-commun'); 
+    }
 
     let isProtector = cardInstance.abilities && cardInstance.abilities.includes("PROTECTOR");
     let isFrozen = !cardInstance.canAttackNextTurn && location === 'field';
@@ -137,7 +141,16 @@ export function createCardDOMElement({ cardInstance, owner, location, gameState,
     } else if (cardInstance.type === "Piege") {
         iconClass = "icon-trap";
     }
-    cardDiv.classList.add(iconClass); // Ajoute la classe d'icône principale pour le fond coloré des objectifs révélés
+    cardDiv.classList.add(iconClass);
+
+    let statsHTML = '<div class="card-stats-area">&nbsp;</div>';
+    if (cardInstance.type === "Monstre") {
+        statsHTML = `
+            <div class="card-stats-area">
+                <span class="stat-box atk-box">ATK: ${cardInstance.atk}</span>
+                <span class="stat-box def-box">DEF: ${cardInstance.def}</span>
+            </div>`;
+    }
 
     if (location === 'booster' || location === 'collection' || location === 'deck') {
         cardDiv.classList.add('card'); 
@@ -145,7 +158,7 @@ export function createCardDOMElement({ cardInstance, owner, location, gameState,
         if (cardInstance.abilities && cardInstance.abilities.length > 0) {
             abilitiesDisplay = cardInstance.abilities.join(', ');
         } else if (cardInstance.type !== "Monstre") {
-            abilitiesDisplay = cardInstance.type; // Affiche "Magie" ou "Piege" si pas d'abilities
+            abilitiesDisplay = cardInstance.type;
         }
 
         cardDiv.innerHTML = `
@@ -153,19 +166,19 @@ export function createCardDOMElement({ cardInstance, owner, location, gameState,
                 <span class="card-type-icon ${iconClass}"></span>
                 <span class="card-name-text">${cardInstance.name}</span>
             </div>
-            <div class="card-image-area"></div>
-            ${cardInstance.type === "Monstre" ? `<div class="card-stats-area"><span>ATK:${cardInstance.atk}</span><span>DEF:${cardInstance.def}</span></div>` : '<div class="card-stats-area">&nbsp;</div>'}
+            <div class="card-image-container">
+                <div class="card-image-area"></div>
+            </div>
+            ${statsHTML}
             <div class="card-ability-text">${abilitiesDisplay}</div>
             <div class="card-description-area custom-scrollbar">${cardInstance.description || 'Aucune.'}</div>`;
         
-        cardDiv.style.cursor = 'pointer'; // Curseur pour toutes ces cartes car elles auront une action (info ou ajout/retrait)
+        cardDiv.style.cursor = 'pointer';
         
-        // Les actions pour collection/deck sont gérées dans deckBuilder.js.
-        // Ici, c'est principalement pour `onShowInfo` si disponible.
         if (actions && actions.onShowInfo) {
              cardDiv.addEventListener('click', (e) => { 
-                e.stopPropagation(); // Important pour éviter les conflits de clics
-                actions.onShowInfo(cardInstance, false); // false car on ne peut pas jouer depuis collection/deck/booster directement
+                e.stopPropagation(); 
+                actions.onShowInfo(cardInstance, false); 
             });
         }
     } else if (location === 'goal') {
@@ -205,21 +218,20 @@ export function createCardDOMElement({ cardInstance, owner, location, gameState,
         cardDiv.classList.add('card');
         if (owner === "Joueur") cardDiv.classList.add('player-card'); else cardDiv.classList.add('opponent-card');
 
-        if (owner === "Joueur" && location === 'hand' && (cardInstance.type === "Monstre" /* || autres types jouables depuis la main */)) {
+        if (owner === "Joueur" && location === 'hand' && (cardInstance.type === "Monstre")) {
             cardDiv.classList.add('playable');
         }
-
 
         if (location === 'field' && cardInstance.hasAttackedThisTurn && !isFrozen) cardDiv.style.opacity = "0.65";
         else if (!isFrozen) cardDiv.style.opacity = "1";
 
         let abTxt = "";
-        if (location === 'field') { // Afficher "Protecteur" ou "Gelé" en priorité
+        if (location === 'field') { 
             if(isProtector) abTxt = `<div class="card-ability-text is-protector-text">Protecteur</div>`;
             else if(isFrozen) abTxt = `<div class="card-ability-text is-frozen-text">Gelé!</div>`;
-            else if (cardInstance.type !== "Monstre") abTxt = `<div class="card-ability-text">${cardInstance.type}</div>`; // Si Magie/Piège sur terrain (improbable mais bon)
-            else abTxt = `<div class="card-ability-text">&nbsp;</div>`; // Monstre sans statut particulier
-        } else if (location === 'hand') { // Pour la main, juste le type si ce n'est pas un monstre
+            else if (cardInstance.type !== "Monstre") abTxt = `<div class="card-ability-text">${cardInstance.type}</div>`; 
+            else abTxt = `<div class="card-ability-text">&nbsp;</div>`; 
+        } else if (location === 'hand') { 
              if (cardInstance.type !== "Monstre") abTxt = `<div class="card-ability-text">${cardInstance.type}</div>`;
              else abTxt = `<div class="card-ability-text">&nbsp;</div>`;
         } else {
@@ -231,15 +243,16 @@ export function createCardDOMElement({ cardInstance, owner, location, gameState,
                 <span class="card-type-icon ${iconClass}"></span>
                 <span class="card-name-text">${cardInstance.name}</span>
             </div>
-            <div class="card-image-area"></div>
-            ${cardInstance.type === "Monstre" ? `<div class="card-stats-area"><span>ATK:${cardInstance.atk}</span><span>DEF:${cardInstance.def}</span></div>` : '<div class="card-stats-area">&nbsp;</div>'}
+            <div class="card-image-container">
+                <div class="card-image-area"></div>
+            </div>
+            ${statsHTML}
             ${abTxt}
             <div class="card-description-area"></div>`;
 
         if (!gameState.gameIsOver) {
             if (owner === "Joueur") {
                 if (location === 'hand') { 
-                    // Jouer une carte se fait via la popup maintenant pour plus de clarté
                     if (actions && actions.onShowInfo) cardDiv.addEventListener('click', () => { actions.onShowInfo(cardInstance, true, actions.onPlayCard); });
                 } else if (location === 'field' && cardInstance.type === "Monstre") {
                     if (!cardInstance.hasAttackedThisTurn && cardInstance.canAttackNextTurn) { 
@@ -247,7 +260,7 @@ export function createCardDOMElement({ cardInstance, owner, location, gameState,
                     } else { 
                         if (actions && actions.onShowInfo) cardDiv.addEventListener('click', () => actions.onShowInfo(cardInstance)); 
                     }
-                } else if (location === 'field') { // Autres types sur le terrain (ex: Magie continue)
+                } else if (location === 'field') { 
                     if (actions && actions.onShowInfo) cardDiv.addEventListener('click', () => actions.onShowInfo(cardInstance));
                 }
             } else if (owner === "IA" && location === 'field' && cardInstance.type === "Monstre") {
@@ -259,10 +272,10 @@ export function createCardDOMElement({ cardInstance, owner, location, gameState,
                 } else { 
                     if (actions && actions.onShowInfo) cardDiv.addEventListener('click', () => actions.onShowInfo(cardInstance));
                 }
-            } else { // Cartes IA en main (non cliquable) ou autres types IA sur terrain (info seulement)
+            } else { 
                 if (actions && actions.onShowInfo && location !== 'hand') cardDiv.addEventListener('click', () => actions.onShowInfo(cardInstance));
             }
-        } else { // Jeu terminé, clic pour info seulement
+        } else { 
             if (actions && actions.onShowInfo) cardDiv.addEventListener('click', () => actions.onShowInfo(cardInstance));
         }
     }
@@ -298,7 +311,7 @@ function renderZone(areaElement, title, cards, owner, location, gameState, actio
             });
         }
     } else {
-        if (cards.length === 0 && location !== 'hand') { // Pas de message "(Vide)" pour la main du joueur, c'est évident
+        if (cards.length === 0 && location !== 'hand') {
              areaElement.innerHTML += '<p class="empty-zone-text">(Vide)</p>';
         } else {
             cards.forEach(c => areaElement.appendChild(createCardDOMElement({ cardInstance: c, owner, location, gameState, actions })));
@@ -314,7 +327,7 @@ function renderZone(areaElement, title, cards, owner, location, gameState, actio
 export function renderPlayerHand(playerHand, gameState, actions) { renderZone(playerHandArea, 'Ma Main', playerHand, "Joueur", "hand", gameState, actions); }
 export function renderPlayerField(playerField, gameState, actions) { renderZone(playerFieldArea, 'Mon Terrain', playerField, "Joueur", "field", gameState, actions); }
 export function renderPlayerGoalCards(playerGoalCards, gameState, actions) { renderZone(playerGoalCardArea, 'Mes Objectifs', playerGoalCards, "Joueur", "goal", gameState, actions, true); }
-export function renderOpponentHand(opponentHand) { renderZone(opponentHandArea, 'Main IA', opponentHand, "IA", "hand", {}, {}); } // gameState et actions non pertinents pour main IA cachée
+export function renderOpponentHand(opponentHand) { renderZone(opponentHandArea, 'Main IA', opponentHand, "IA", "hand", {}, {}); }
 export function renderOpponentField(opponentField, gameState, actions) { renderZone(opponentFieldArea, 'Terrain IA', opponentField, "IA", "field", gameState, actions); }
 export function renderOpponentGoalCards(opponentGoalCards, gameState, actions) { renderZone(opponentGoalCardArea, 'Objectifs IA', opponentGoalCards, "IA", "goal", gameState, actions, true); }
 
@@ -355,7 +368,7 @@ export function setTurnIndicator(actor, gameIsOver = false) {
     } else if (actor === 'Joueur') {
         if (drawButton) drawButton.disabled = false;
         if (endTurnButton) endTurnButton.disabled = false;
-    } else { // IA ou état indéterminé (début de partie avant tour joueur)
+    } else { 
         if (drawButton) drawButton.disabled = true;
         if (endTurnButton) endTurnButton.disabled = true;
     }
