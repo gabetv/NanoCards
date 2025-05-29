@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deck Masters: Origins</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Écran du Menu Principal -->
+    <div id="main-menu-screen" class="screen active-screen">
+        <h1 class="game-title-main">Deck Masters: Origins</h1>
+        <div class="menu-buttons">
+            <button id="play-ai-button" class="menu-button primary-action">Jouer vs IA</button>
+            <button id="deck-builder-button" class="menu-button secondary-action">Éditeur de Deck</button>
+            <button id="open-booster-button" class="menu-button secondary-action">Ouvrir un Booster</button>
+        </div>
+        <div class="version-info">v0.3 Alpha</div> <!-- Mise à jour version indicative -->
+    </div>
+
+    <!-- Écran d'Ouverture de Booster -->
+    <div id="booster-opening-screen" class="screen">
+        <button id="back-to-menu-from-booster-button" class="menu-button back-button">&larr; Menu</button>
+        <h2 class="screen-title">Contenu du Booster</h2>
+        <div id="booster-cards-area" class="area card-display-area">
+            <h2>Contenu du Booster</h2> <!-- Titre peut être ici ou dans le JS qui remplit -->
+            <!-- Les cartes du booster seront injectées ici par JavaScript -->
+        </div>
+        <button id="open-another-booster-button" class="menu-button secondary-action">Ouvrir un Autre</button>
+    </div>
+
+    <!-- Écran de l'Éditeur de Deck -->
+    <div id="deck-builder-screen" class="screen">
+        <button id="back-to-menu-from-deck-builder" class="menu-button back-button">&larr; Menu</button>
+        <h2 class="screen-title">Éditeur de Deck</h2>
+        
+        <div class="deck-builder-main-layout" style="display: flex; flex-direction: column; flex-grow: 1; overflow-y: auto; gap: 10px; width:100%;">
+            <div id="deck-builder-collection-area" class="area card-display-area" style="min-height: 200px; max-height: 45vh;">
+                 <h2>Ma Collection</h2>
+            </div>
+            <div style="text-align: center; font-weight: bold; padding: 8px 0; background-color: var(--bg-color-darkest); border-radius: 4px; margin: 5px 0;">
+                Deck Actuel: <span id="deck-builder-deck-count">0 / 40</span>
+            </div>
+            <div id="deck-builder-deck-area" class="area card-display-area" style="min-height: 150px; max-height: 35vh;">
+                <h2>Mon Deck Actuel</h2>
+            </div>
+        </div>
+        <!-- Zone pour les boutons d'action du Deck Builder -->
+        <div class="deck-builder-actions" style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top:auto; padding-top: 15px; width: 100%;">
+            <button id="deck-builder-auto-button" class="menu-button secondary-action" style="width: 85%; max-width: 300px;">Deck Auto (20)</button>
+            <button id="deck-builder-save-button" class="menu-button primary-action" style="width: 85%; max-width: 300px;">Sauvegarder Deck</button>
+        </div>
+    </div>
+
+
+    <!-- Plateau de Jeu -->
+    <div id="game-board" class="screen">
+        <div class="game-layout">
+            <!-- Section Adversaire -->
+            <div class="player-section opponent-section">
+                <div class="player-info-bar">
+                    <span class="player-name opponent-name">Adversaire</span>
+                </div>
+                <div class="area goal-card-area opponent-goals" id="opponent-goal-card-area"><h2>Objectifs IA</h2></div>
+                <div class="area hand-area opponent-hand" id="opponent-hand-area"><h2>Main IA</h2></div>
+                <div class="area field-area opponent-field" id="opponent-field-area"><h2>Terrain IA</h2></div>
+            </div>
+
+            <hr class="field-divider">
+
+            <!-- Section Joueur -->
+            <div class="player-section player-section-main">
+                <div class="area field-area player-field" id="player-field-area"><h2>Mon Terrain</h2></div>
+                <div class="area hand-area player-hand" id="player-hand-area"><h2>Ma Main</h2></div>
+                <div class="area goal-card-area player-goals" id="player-goal-card-area"><h2>Mes Objectifs</h2></div>
+                 <div class="player-info-bar">
+                    <span class="player-name main-player-name">Joueur</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="controls">
+            <div id="deck-area">
+                <button id="draw-card-button" class="game-action-button">Piocher</button>
+                <p>Deck: <span id="deck-count">0</span></p>
+            </div>
+            <button id="end-turn-button" class="game-action-button endturn-button">Fin de Tour</button>
+            <button id="quit-game-button" class="game-action-button quit-button" style="display: none;">Quitter</button>
+        </div>
+        
+        <div id="game-message-area"><p id="game-message"></p></div>
+    </div>
+
+    <!-- Overlay pour l'effet d'impact visuel -->
+    <div id="impact-flash-overlay"><div id="impact-visual"></div></div>
+
+    <!-- Popup pour les informations détaillées de la carte -->
+    <div id="card-info-popup" class="screen"> 
+        <button id="close-popup-button" aria-label="Fermer les détails">&times;</button>
+        <div id="popup-card-name">Nom de la Carte</div>
+        <div id="popup-card-type-cost">
+            <span id="popup-card-type">Type: Monstre</span>
+            <span id="popup-card-cost" style="display:none;">Coût: 3</span>
+        </div>
+        <div id="popup-card-stats" style="display:none;">ATK: 10 / DEF: 5</div>
+        <div id="popup-card-abilities">Capacités: Protecteur</div>
+        <div id="popup-card-description" class="custom-scrollbar">Description complète...</div>
+        <div class="popup-actions">
+            <button id="play-card-from-popup-button" class="menu-button primary-action" style="display:none;">Jouer Carte</button>
+        </div>
+    </div>
+
+    <!-- Scripts Modulaires -->
+    <script type="module" src="utils.js"></script>
+    <script type="module" src="cardManager.js"></script>
+    <script type="module" src="deckBuilder.js"></script>
+    <script type="module" src="uiManager.js"></script>
+    <script type="module" src="aiLogic.js"></script>
+    <script type="module" src="gameLogic.js"></script>
+    <script type="module" src="main.js"></script> 
+</body>
+</html>

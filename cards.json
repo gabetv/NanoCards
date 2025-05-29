@@ -1,0 +1,117 @@
+[
+  {
+    "id": "m001",
+    "name": "Dragonnet Flamboyant",
+    "type": "Monstre",
+    "atk": 18,
+    "def": 12,
+    "description": "Un jeune dragon cracheur de feu."
+  },
+  {
+    "id": "m002",
+    "name": "Garde d'Élite",
+    "type": "Monstre",
+    "atk": 10,
+    "def": 20,
+    "description": "Un soldat loyal avec une armure épaisse. Bloque les attaques vers les objectifs.",
+    "abilities": ["PROTECTOR"]
+  },
+  {
+    "id": "m003",
+    "name": "Tireur d'Élite Sylvestre",
+    "type": "Monstre",
+    "atk": 15,
+    "def": 8,
+    "description": "Précis et mortel à distance."
+  },
+  {
+    "id": "m004",
+    "name": "Colosse de Granit",
+    "type": "Monstre",
+    "atk": 8,
+    "def": 22,
+    "description": "Une forteresse mobile. Bloque les attaques vers les objectifs.",
+    "abilities": ["PROTECTOR"]
+  },
+  {
+    "id": "m005",
+    "name": "Lutin Vif",
+    "type": "Monstre",
+    "atk": 12,
+    "def": 6,
+    "description": "Rapide et difficile à attraper."
+  },
+  {
+    "id": "m006",
+    "name": "Sentinelle de Bronze",
+    "type": "Monstre",
+    "atk": 7,
+    "def": 18,
+    "description": "Un gardien immobile mais résistant. Bloque les attaques vers les objectifs.",
+    "abilities": ["PROTECTOR"]
+  },
+  {
+    "id": "m007",
+    "name": "Bête Sauvage",
+    "type": "Monstre",
+    "atk": 20,
+    "def": 10,
+    "description": "Une créature féroce et imprévisible."
+  },
+  {
+    "id": "s001",
+    "name": "Piège Explosif",
+    "type": "Piege",
+    "description": "Lorsqu'il est détruit : Détruit le monstre attaquant.",
+    "effectOnDestroy": "DESTROY_ATTACKER"
+  },
+  {
+    "id": "s002",
+    "name": "Sape d'Énergie",
+    "type": "Piege",
+    "description": "Lorsqu'il est détruit : Le propriétaire du monstre attaquant défausse une carte aléatoire de sa main.",
+    "effectOnDestroy": "OPPONENT_DISCARD_RANDOM"
+  },
+  {
+    "id": "s003",
+    "name": "Renfort Inattendu",
+    "type": "Magie",
+    "description": "Lorsqu'elle est détruite : Vous piochez une carte.",
+    "effectOnDestroy": "OWNER_DRAW_CARD"
+  },
+  {
+    "id": "s004",
+    "name": "Toucher Glacial",
+    "type": "Magie",
+    "description": "Lorsqu'elle est détruite : Réduit l'ATK d'un monstre aléatoire de l'attaquant de 5 points.",
+    "effectOnDestroy": "REDUCE_ATTACKER_MONSTER_ATK_5"
+  },
+  {
+    "id": "s005",
+    "name": "Cri de Guerre",
+    "type": "Piege",
+    "description": "Lorsqu'elle est détruite : Augmente l'ATK d'un de vos monstres aléatoires de 5 points.",
+    "effectOnDestroy": "BUFF_OWN_MONSTER_ATK_5"
+  },
+  {
+    "id": "s006",
+    "name": "Vent Repoussant",
+    "type": "Magie",
+    "description": "Lorsqu'elle est détruite : Le monstre attaquant est renvoyé dans la main de son propriétaire.",
+    "effectOnDestroy": "RETURN_ATTACKER_TO_HAND"
+  },
+  {
+    "id": "s007",
+    "name": "Aura de Lenteur",
+    "type": "Piege",
+    "description": "Lorsqu'elle est détruite : Le monstre attaquant ne peut pas attaquer au prochain tour de son propriétaire.",
+    "effectOnDestroy": "FREEZE_ATTACKER_NEXT_TURN"
+  },
+  {
+    "id": "s008",
+    "name": "Appel aux Armes",
+    "type": "Magie",
+    "description": "Lorsqu'elle est détruite : Vous pouvez invoquer spécialement un monstre de votre main avec ATK <= 10.",
+    "effectOnDestroy": "SPECIAL_SUMMON_FROM_HAND_ATK_10"
+  }
+]
