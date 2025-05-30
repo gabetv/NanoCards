@@ -27,7 +27,10 @@ export function playAnimation(element, animationClass, duration = 600) {
         }
         element.classList.add(animationClass);
         setTimeout(() => {
-            element.classList.remove(animationClass);
+            // Vérifier si l'élément existe toujours avant de remove la classe
+            if (element && element.classList) { // Vérifier aussi element.classList pour les cas extrêmes
+               element.classList.remove(animationClass);
+            }
             resolve();
         }, duration);
     });
@@ -49,7 +52,7 @@ export async function triggerScreenShake(intensity = 'light', duration = 300, ta
     
     targetElement.classList.add(shakeClass);
     await new Promise(resolve => setTimeout(() => {
-        targetElement.classList.remove(shakeClass);
+        if (targetElement) targetElement.classList.remove(shakeClass);
         resolve();
     }, duration));
 }
@@ -68,7 +71,7 @@ export async function triggerImpactFlash(duration = 500, impactOverlayElement) {
     impactOverlayElement.classList.add('impact-flash-overlay-active');
     // La durée est gérée par l'animation CSS elle-même. On attend juste sa fin.
     await new Promise(resolve => setTimeout(() => {
-        impactOverlayElement.classList.remove('impact-flash-overlay-active');
+        if (impactOverlayElement) impactOverlayElement.classList.remove('impact-flash-overlay-active');
         resolve();
     }, duration)); 
 }
@@ -82,19 +85,17 @@ export async function triggerImpactFlash(duration = 500, impactOverlayElement) {
 export function displayGameMessage(message, messageElement, duration = 4000) {
     if (!messageElement) {
         console.warn("displayGameMessage: L'élément de message n'est pas fourni.");
-        console.log("Jeu Msg:", message); // Log en fallback
+        console.log("Jeu Msg:", message); 
         return;
     }
     console.log("Jeu Msg:", message);
     messageElement.textContent = message;
-    // Optionnel: ajouter une classe pour animer l'apparition/disparition du message
-    // messageElement.classList.add('message-visible'); 
-
+    // Gérer les timeouts pour éviter d'effacer un message plus récent
+    // On pourrait stocker le timeoutID et le clearer si un nouveau message arrive.
+    // Pour l'instant, on se base sur la comparaison du texte.
     setTimeout(() => {
-        // N'effacer que si c'est toujours le même message (évite d'effacer un nouveau message arrivé entre-temps)
         if (messageElement.textContent === message) {
             messageElement.textContent = "";
-            // messageElement.classList.remove('message-visible');
         }
     }, duration);
 }

@@ -1,8 +1,8 @@
 // gameLogic.js
 import { createCardInstance, initializeDeck, initializeGoalCards } from './cardManager.js';
-import * as ui from './uiManager.js'; // Pour les fonctions de rendu UI et messages
+import * as ui from './uiManager.js'; 
 import * as ai from './aiLogic.js';
-import { shuffleDeck, hasProtector, playAnimation } from './utils.js'; // IMPORT playAnimation ICI
+import { shuffleDeck, hasProtector, playAnimation } from './utils.js'; 
 import { getUserDeck } from './deckBuilder.js';
 
 // --- État du Jeu ---
@@ -43,20 +43,23 @@ export function setupNewGame() {
     selectedPlayerCard = null; isPlayerTurn = true; gameIsOver = false; turnNumber = 1;
 
     const customDeck = getUserDeck();
-    if (customDeck && customDeck.length >= 20) {
+    if (customDeck && customDeck.length >= 20) { // Assurez-vous que MIN_DECK_SIZE est respecté
         playerDeck = [...customDeck]; 
         shuffleDeck(playerDeck);
         console.log("Deck joueur initialisé avec le deck personnalisé.", playerDeck.length, "cartes.");
     } else {
         initializeDeck(playerDeck); 
         console.log("Deck personnalisé non valide ou non trouvé, utilisation du deck par défaut.");
+        if (customDeck && customDeck.length > 0 && customDeck.length < 20) {
+             ui.displayGameMessage("Votre deck personnalisé est invalide (< 20 cartes). Utilisation d'un deck par défaut.", 5000);
+        }
     }
 
     initializeDeck(opponentDeck);
     initializeGoalCards(playerGoalCards);
     initializeGoalCards(opponentGoalCards);
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) { // Pioche initiale
         actionDrawCard('Joueur');
         actionDrawCard('IA');
     }
@@ -64,7 +67,8 @@ export function setupNewGame() {
     ui.updateDeckCount(playerDeck.length);
     ui.displayGameMessage("Duel Commencé ! Détruisez les 4 objectifs adverses. À vous!");
     ui.showScreen('game');
-    document.getElementById('quit-game-button').style.display = 'inline-block';
+    const quitButton = document.getElementById('quit-game-button');
+    if (quitButton) quitButton.style.display = 'inline-block';
     
     ui.setTurnIndicator('Joueur', gameIsOver);
     renderFullBoard();
@@ -74,8 +78,9 @@ export function quitGame() {
     gameIsOver = true; 
     ui.displayGameMessage("Partie quittée.");
     ui.showScreen('menu');
-    document.getElementById('quit-game-button').style.display = 'none';
-    ui.setTurnIndicator(null, gameIsOver);
+    const quitButton = document.getElementById('quit-game-button');
+    if (quitButton) quitButton.style.display = 'none';
+    ui.setTurnIndicator(null, gameIsOver); // Nettoyer l'indicateur de tour
 }
 
 
@@ -112,6 +117,7 @@ function actionDrawCard(actor) {
         }
     } else if (deck.length === 0) {
         ui.displayGameMessage(`Le deck de ${actor} est vide !`);
+        // Gérer la condition de défaite par deck out ici si applicable
     } else if (actor === 'Joueur' && hand.length >= 7) {
         ui.displayGameMessage("Votre main est pleine (max 7 cartes) !");
     }
@@ -135,14 +141,14 @@ function handlePlayCardFromHand(cardInstanceId, actor) {
             hand.splice(cardIndex, 1);
             field.push(cardToPlay);
             ui.displayGameMessage(`${actor} joue ${cardToPlay.name}.`);
-            renderFullBoard(); // Mettre à jour après avoir joué une carte
+            renderFullBoard(); 
         } else if (cardToPlay.type !== "Monstre") {
-            ui.displayGameMessage("Seuls les monstres peuvent être joués sur le terrain.");
+            ui.displayGameMessage("Seuls les monstres peuvent être joués sur le terrain pour l'instant.");
         } else if (field.length >= 5) {
             ui.displayGameMessage(`${actor} : Terrain plein (max 5 monstres) !`);
         }
     }
-    ui.hideCardInfo();
+    ui.hideCardInfo(); // Toujours cacher la popup après une tentative de jeu
 }
 
 function handleSelectPlayerCardForAttack(cardInstanceId) {
@@ -160,11 +166,14 @@ function handleSelectPlayerCardForAttack(cardInstanceId) {
     }
     selectedPlayerCard = card;
     renderFullBoard(); 
+    ui.displayGameMessage(`Sélectionné : ${card.name}. Cliquez sur une cible adverse.`);
 }
 
 // --- Logique de Combat et Effets ---
 async function executeCombat(attacker, target, attackerOwner) {
     if (gameIsOver || !attacker || attacker.hasAttackedThisTurn || !attacker.canAttackNextTurn) {
+        if (attackerOwner === "Joueur") selectedPlayerCard = null; // Désélectionner si l'attaque est invalide
+        renderFullBoard();
         return;
     }
 
@@ -174,7 +183,7 @@ async function executeCombat(attacker, target, attackerOwner) {
     if (hasProtector(defenderOwnerField)) {
         if (target.type === "Monstre" && (!target.abilities || !target.abilities.includes("PROTECTOR"))) {
              ui.displayGameMessage(`Attaque bloquée ! Vous devez cibler un monstre avec "Protecteur" d'abord.`);
-             await ui.uiTriggerScreenShake('light', 200); // uiTriggerScreenShake est exporté par uiManager
+             await ui.uiTriggerScreenShake('light', 200);
              if (attackerOwner === "Joueur") {
                  selectedPlayerCard = null; 
                  renderFullBoard();
@@ -187,27 +196,24 @@ async function executeCombat(attacker, target, attackerOwner) {
     const attackerEl = document.querySelector(`.card[data-instance-id="${attacker.instanceId}"]`);
     const targetEl = document.querySelector(`.card[data-instance-id="${target.instanceId}"], .goal-card[data-instance-id="${target.instanceId}"]`);
 
-    // UTILISATION DIRECTE de playAnimation depuis utils.js
     if (attackerEl) await playAnimation(attackerEl, attackerOwner === "Joueur" ? 'animate-attack' : 'animate-attack-opponent', 600);
     
-    // ui.uiTrigger... sont des fonctions de uiManager qui appellent les fonctions de utils.js
     await Promise.all([ui.uiTriggerImpactFlash(500), ui.uiTriggerScreenShake('light', 300)]);
 
     attacker.hasAttackedThisTurn = true;
     let targetDestroyedInCombat = false; 
-    let monsterWasDestroyed = false;
+    let monsterWasDestroyedOnField = false; // Pour savoir si un MONSTRE a été détruit (pour le shake plus fort)
 
     if (target.type === "Monstre") {
         const defender = target;
         if (attacker.atk > defender.def) {
             ui.displayGameMessage(`${defender.name} est détruit.`);
             targetDestroyedInCombat = true; 
-            monsterWasDestroyed = true;
+            monsterWasDestroyedOnField = true;
             if(attackerOwner === "Joueur") opponentField = opponentField.filter(c => c.instanceId !== defender.instanceId);
             else playerField = playerField.filter(c => c.instanceId !== defender.instanceId);
         } else { 
             ui.displayGameMessage(`Attaque de ${attacker.name} absorbée par la DÉF de ${defender.name} !`);
-            // UTILISATION DIRECTE de playAnimation
             if (targetEl) await playAnimation(targetEl, 'animate-shake', 300);
         }
     } else if (targetIsGoalCard) {
@@ -218,27 +224,34 @@ async function executeCombat(attacker, target, attackerOwner) {
         
         await applyGoalCardEffect(target, attacker, attackerOwner); 
         
+        // Enlever la carte objectif détruite du tableau approprié
         if(attackerOwner === "Joueur") {
-            opponentGoalCards = opponentGoalCards.map(gc => gc && gc.instanceId === target.instanceId ? null : gc).filter(gc => gc);
+            // Remplacer par null pour garder la position, puis filtrer ou marquer comme "détruit visuellement"
+            const goalIndex = opponentGoalCards.findIndex(gc => gc && gc.instanceId === target.instanceId);
+            if (goalIndex > -1) opponentGoalCards[goalIndex] = null;
         } else {
-            playerGoalCards = playerGoalCards.map(gc => gc && gc.instanceId === target.instanceId ? null : gc).filter(gc => gc);
+            const goalIndex = playerGoalCards.findIndex(gc => gc && gc.instanceId === target.instanceId);
+            if (goalIndex > -1) playerGoalCards[goalIndex] = null;
         }
     }
 
-    if(monsterWasDestroyed) await ui.uiTriggerScreenShake('heavy', 400);
+    if(monsterWasDestroyedOnField) await ui.uiTriggerScreenShake('heavy', 400);
     if(targetDestroyedInCombat && targetEl) { 
+        // Animation de destruction pour la carte cible si elle est détruite
         targetEl.classList.add('animate-destroy'); 
-        await new Promise(r => setTimeout(r, 700)); 
+        await new Promise(r => setTimeout(r, 700)); // Attendre la fin de l'animation de destruction
     }
     
-    if(attackerOwner === "Joueur") selectedPlayerCard = null; 
+    if(attackerOwner === "Joueur") selectedPlayerCard = null; // Désélectionner après l'attaque
     
-    renderFullBoard(); 
-    checkWinCondition(); 
+    renderFullBoard(); // Mettre à jour l'UI après le combat et les effets
+    checkWinCondition(); // Vérifier si le jeu est terminé
 }
     
 async function applyGoalCardEffect(goalCard, attacker, attackerOwner) {
     ui.displayGameMessage(`Effet de l'objectif: "${goalCard.name}" - ${goalCard.description}`);
+    await new Promise(r => setTimeout(r, 500)); // Petite pause pour lire l'effet
+
     const effectKey = goalCard.effectOnDestroy;
     
     let attackerPlayerField = attackerOwner === "Joueur" ? playerField : opponentField;
@@ -261,7 +274,8 @@ async function applyGoalCardEffect(goalCard, attacker, attackerOwner) {
             break;
         case "OPPONENT_DISCARD_RANDOM": 
             if (attackerPlayerHand.length > 0) {
-                const discardedCard = attackerPlayerHand.splice(Math.floor(Math.random() * attackerPlayerHand.length), 1)[0];
+                const discardedCardIndex = Math.floor(Math.random() * attackerPlayerHand.length);
+                const discardedCard = attackerPlayerHand.splice(discardedCardIndex, 1)[0];
                 ui.displayGameMessage(`${attackerOwner} défausse ${discardedCard.name} de sa main.`);
             } else ui.displayGameMessage(`${attackerOwner} n'a pas de cartes en main à défausser.`);
             break;
@@ -275,34 +289,43 @@ async function applyGoalCardEffect(goalCard, attacker, attackerOwner) {
                 attackerToDebuff.atk = Math.max(0, attackerToDebuff.atk - 5);
                 ui.displayGameMessage(`${attackerToDebuff.name} de ${attackerOwner} perd 5 ATK (maintenant ${attackerToDebuff.atk} ATK).`);
                 const elDebuff = document.querySelector(`.card[data-instance-id="${attackerToDebuff.instanceId}"]`);
-                // UTILISATION DIRECTE de playAnimation
                 if (elDebuff) await playAnimation(elDebuff, 'animate-shake', 300);
             } else ui.displayGameMessage(`${attacker.name} n'est plus sur le terrain.`);
             break;
         case "BUFF_OWN_MONSTER_ATK_5": 
-            if (goalCardOwnerField.length > 0) {
-                const monsterToBuff = goalCardOwnerField[Math.floor(Math.random() * goalCardOwnerField.length)];
+            if (goalCardOwnerField.filter(c => c.type === "Monstre").length > 0) { // S'assurer qu'il y a des monstres
+                const monstersToBuff = goalCardOwnerField.filter(c => c.type === "Monstre");
+                const monsterToBuff = monstersToBuff[Math.floor(Math.random() * monstersToBuff.length)];
                 monsterToBuff.atk += 5;
                 ui.displayGameMessage(`${monsterToBuff.name} de ${goalCardOwnerActor} gagne 5 ATK (maintenant ${monsterToBuff.atk} ATK).`);
                 const elBuff = document.querySelector(`.card[data-instance-id="${monsterToBuff.instanceId}"]`);
-                // UTILISATION DIRECTE de playAnimation
                 if (elBuff) await playAnimation(elBuff, 'animate-shake', 300);
             } else ui.displayGameMessage(`${goalCardOwnerActor} n'a pas de monstres sur le terrain à buffer.`);
             break;
         case "RETURN_ATTACKER_TO_HAND":
             const attackerToReturn = attackerPlayerField.find(m => m.instanceId === attacker.instanceId);
             if (attackerToReturn) {
-                ui.displayGameMessage(`${attackerToReturn.name} est renvoyé dans la main de ${attackerOwner} !`);
                 const el = document.querySelector(`.card[data-instance-id="${attackerToReturn.instanceId}"]`);
+                if (el) { el.classList.add('animate-destroy'); await new Promise(r => setTimeout(r, 400)); } // Animation avant de retirer
+
                 if (attackerOwner === "Joueur") {
                     playerField = playerField.filter(m => m.instanceId !== attackerToReturn.instanceId);
-                    if (playerHand.length < 7) playerHand.push(attackerToReturn); 
-                    else ui.displayGameMessage("Main du joueur pleine, carte non retournée.");
-                } else {
+                    if (playerHand.length < 7) {
+                        playerHand.push(attackerToReturn); 
+                        ui.displayGameMessage(`${attackerToReturn.name} est renvoyé dans la main de ${attackerOwner} !`);
+                    } else {
+                        ui.displayGameMessage(`Main du joueur pleine, ${attackerToReturn.name} est défaussé.`);
+                        // Optionnel: défausser au lieu de juste ne pas ajouter.
+                    }
+                } else { // IA
                     opponentField = opponentField.filter(m => m.instanceId !== attackerToReturn.instanceId);
-                    if (opponentHand.length < 7) opponentHand.push(attackerToReturn);
+                    if (opponentHand.length < 7) {
+                        opponentHand.push(attackerToReturn);
+                        ui.displayGameMessage(`${attackerToReturn.name} est renvoyé dans la main de ${attackerOwner} !`);
+                    } else {
+                         ui.displayGameMessage(`Main de l'IA pleine, ${attackerToReturn.name} est défaussé.`);
+                    }
                 }
-                if (el) { el.classList.add('animate-destroy'); await new Promise(r => setTimeout(r, 700)); }
             } else ui.displayGameMessage(`${attacker.name} n'est plus sur le terrain.`);
             break;
         case "FREEZE_ATTACKER_NEXT_TURN":
@@ -335,24 +358,26 @@ export async function endPlayerTurn() {
     if (!isPlayerTurn || gameIsOver) return;
     ui.displayGameMessage("Joueur termine son tour."); 
     isPlayerTurn = false;
-    selectedPlayerCard = null; 
+    selectedPlayerCard = null; // Désélectionner carte du joueur
     ui.setTurnIndicator('IA', gameIsOver);
+    renderFullBoard(); // Mettre à jour l'UI pour refléter le changement de tour et la désélection
     
-    await new Promise(resolve => setTimeout(resolve, 500)); 
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Pause avant le tour de l'IA
     if (!gameIsOver) executeOpponentTurnLogic();
 }
 
 async function executeOpponentTurnLogic() {
     if (gameIsOver) { 
-        if (!isPlayerTurn) startPlayerTurnLogic(); 
+        if (!isPlayerTurn) startPlayerTurnLogic(); // Si le jeu s'est terminé pendant le tour de l'IA, redonner la main (pour affichage fin de partie)
         return; 
     }
     ui.displayGameMessage("--- Tour de l'IA ---"); 
 
     opponentField.forEach(card => {
         card.hasAttackedThisTurn = false;
-        if (card.canAttackNextTurn === false) {
+        if (card.canAttackNextTurn === false) { // Dégeler les cartes de l'IA
             card.canAttackNextTurn = true; 
+             // ui.displayGameMessage(`${card.name} de l'IA n'est plus gelé.`); // Optionnel
         }
     });
     renderFullBoard(); 
@@ -368,21 +393,37 @@ async function executeOpponentTurnLogic() {
     
     ai.aiPlayCard(
         { opponentHand, opponentField, playerField, playerGoalCards }, 
-        { playCard: (cardInstId) => handlePlayCardFromHand(cardInstId, 'IA') }
+        { playCard: (cardInstId, actor) => handlePlayCardFromHand(cardInstId, actor) } // Passer l'acteur
     );
     // renderFullBoard est appelé dans handlePlayCardFromHand
 
     await new Promise(r => setTimeout(r, 1700)); 
     if(gameIsOver){ if (!isPlayerTurn) startPlayerTurnLogic(); return; }
     
+    const gameStateForAIAttacks = {
+        gameIsOver, // Passer la variable locale, pas celle du module
+        opponentField,
+        playerField,
+        playerGoalCards
+    };
     await ai.aiPerformAttacks(
-        { gameIsOver, opponentField, playerField, playerGoalCards },
-        { executeAttack: executeCombat } 
+        gameStateForAIAttacks,
+        { executeAttack: (attacker, target, attackerOwner) => executeCombat(attacker, target, attackerOwner) }  // Passer l'acteur
     );
     // renderFullBoard est appelé dans executeCombat
+
+    // Mettre à jour gameIsOver localement si l'IA a gagné/perdu pendant ses attaques
+    if (gameStateForAIAttacks.gameIsOver) {
+        gameIsOver = true;
+    }
     
-    ui.displayGameMessage("--- Fin du Tour de l'IA ---"); 
-    if(!gameIsOver) startPlayerTurnLogic();
+    if (!gameIsOver) {
+        ui.displayGameMessage("--- Fin du Tour de l'IA ---"); 
+        startPlayerTurnLogic();
+    } else {
+        renderFullBoard(); // Assurer que l'UI est à jour si le jeu s'est terminé
+        ui.setTurnIndicator(null, gameIsOver);
+    }
 }
 
 function startPlayerTurnLogic() {
@@ -398,7 +439,7 @@ function startPlayerTurnLogic() {
 
     playerField.forEach(card => {
         card.hasAttackedThisTurn = false;
-        if (card.canAttackNextTurn === false) {
+        if (card.canAttackNextTurn === false) { // Dégeler les cartes du joueur
             ui.displayGameMessage(`${card.name} peut de nouveau attaquer.`);
             card.canAttackNextTurn = true; 
         }
@@ -411,8 +452,8 @@ function startPlayerTurnLogic() {
 function checkWinCondition() {
     if (gameIsOver) return true; 
 
-    const playerGoalsRemaining = playerGoalCards.filter(gc => gc).length;
-    const opponentGoalsRemaining = opponentGoalCards.filter(gc => gc).length;
+    const playerGoalsRemaining = playerGoalCards.filter(gc => gc !== null).length;
+    const opponentGoalsRemaining = opponentGoalCards.filter(gc => gc !== null).length;
 
     if (opponentGoalsRemaining === 0) {
         ui.displayGameMessage("GAGNÉ! Tous les objectifs de l'IA ont été détruits!"); 
@@ -421,10 +462,12 @@ function checkWinCondition() {
         ui.displayGameMessage("PERDU! Tous vos objectifs ont été détruits!"); 
         gameIsOver = true;
     }
+    // Ajouter d'autres conditions de victoire/défaite (ex: deck vide)
 
     if (gameIsOver) {
         ui.setTurnIndicator(null, gameIsOver); 
         renderFullBoard(); 
+        // Peut-être afficher un écran de fin de partie ici
     }
     return gameIsOver;
 }

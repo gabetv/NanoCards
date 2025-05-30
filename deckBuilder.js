@@ -8,7 +8,6 @@ const MAX_COPIES_PER_CARD = 3;
 let userCollection = {};
 let userDeck = [];
 
-// Déplacer les références DOM à l'intérieur d'initializeDeckBuilder ou les réassigner
 let deckBuilderScreen, collectionArea, currentDeckArea, deckCountElement, saveDeckButton, backToMenuFromDeckBuilderButton, autoDeckButton;
 
 let uiCreateCardDOMElement;
@@ -16,10 +15,18 @@ let uiDisplayGameMessage;
 let uiShowScreen;
 let uiShowCardInfo;
 
-// ... (loadUserCollection, saveUserCollection, addToUserCollection, loadUserDeck, saveUserDeck, getUserDeck restent inchangés) ...
 function loadUserCollection() {
     const savedCollection = localStorage.getItem('userCardCollection');
     userCollection = savedCollection ? JSON.parse(savedCollection) : {};
+    // Pour démo: ajouter quelques cartes si la collection est vide
+    if (Object.keys(userCollection).length === 0) {
+        console.log("Collection vide, ajout de cartes de démo.");
+        const demoCards = ["m001", "m002", "m003", "m004", "m005", "m006", "m007", "s001", "s002", "s003", "s004", "s005", "s006", "s007", "s008"];
+        demoCards.forEach(id => {
+            userCollection[id] = (userCollection[id] || 0) + MAX_COPIES_PER_CARD; // Donner 3 copies de chaque
+        });
+        saveUserCollection();
+    }
 }
 
 export function saveUserCollection() {
@@ -27,7 +34,7 @@ export function saveUserCollection() {
 }
 
 export function addToUserCollection(cardId, quantity = 1) {
-    loadUserCollection();
+    loadUserCollection(); // S'assurer qu'on travaille sur la dernière version
     userCollection[cardId] = (userCollection[cardId] || 0) + quantity;
     saveUserCollection();
 }
@@ -53,19 +60,17 @@ function saveUserDeck() {
 
 export function getUserDeck() {
     const savedDeck = localStorage.getItem('userCustomDeck');
+    // Optionnel: valider le deck ici avant de le retourner
     return savedDeck ? JSON.parse(savedDeck) : [];
 }
 
-
-// --- Fonctions de Rendu (renderCollection, renderCurrentDeck) ---
-// ... (identiques à la version précédente, assurez-vous qu'elles utilisent `collectionArea`, `currentDeckArea` etc. qui seront initialisés)
 function renderCollection() {
     if (!collectionArea) { console.error("renderCollection: collectionArea non défini"); return; }
     collectionArea.innerHTML = '<h2>Ma Collection</h2>';
     const allCardDefinitions = getAllCards();
 
     if (Object.keys(userCollection).length === 0) {
-        collectionArea.innerHTML += '<p style="width:100%; text-align:center; color: var(--text-color-medium); padding-top: 20px;">Aucune carte dans votre collection. Ouvrez des boosters !</p>';
+        collectionArea.innerHTML += '<p class="empty-zone-text">Aucune carte dans votre collection. Ouvrez des boosters !</p>';
         return;
     }
 
@@ -74,6 +79,11 @@ function renderCollection() {
         const cardB = allCardDefinitions.find(c => c.id === b);
         if (!cardA || !cardB) return 0;
         if (cardA.type !== cardB.type) return cardA.type.localeCompare(cardB.type);
+        // Optionnel: trier par rareté puis par nom
+        const rarityOrder = { "Commun": 0, "Rare": 1, "Épique": 2, "Légendaire": 3 };
+        const rarityA = rarityOrder[cardA.rarity] ?? -1;
+        const rarityB = rarityOrder[cardB.rarity] ?? -1;
+        if (rarityA !== rarityB) return rarityB - rarityA; // Plus rare en premier
         return cardA.name.localeCompare(cardB.name);
     });
 
@@ -90,29 +100,38 @@ function renderCollection() {
         const countInDeck = userDeck.filter(id => id === cardId).length;
         const availableToAdd = countInCollection - countInDeck;
 
-        const displayCardInstance = { ...cardInstance };
-        displayCardInstance.name = `${cardData.name} (x${availableToAdd})`;
+        const displayCardInstance = { ...cardInstance }; // Utiliser une copie pour l'affichage
+        displayCardInstance.name = `${cardData.name} (x${availableToAdd})`; // Afficher le compte disponible
 
         const cardElement = uiCreateCardDOMElement({
             cardInstance: displayCardInstance,
-            owner: 'collection',
-            location: 'booster', 
-            gameState: {}, 
-            actions: { onShowInfo: (inst) => { if(uiShowCardInfo) uiShowCardInfo(cardInstance, false); } } 
+            owner: 'collection', // Pas vraiment un owner, juste un contexte
+            location: 'collection', // Spécifier que c'est pour la collection
+            gameState: {}, // Pas d'état de jeu pertinent ici
+            actions: { onShowInfo: (inst) => { if(uiShowCardInfo) uiShowCardInfo(cardInstance, false); } } // Afficher info de l'instance originale
         });
 
         if (availableToAdd > 0 && userDeck.length < MAX_DECK_SIZE && countInDeck < MAX_COPIES_PER_CARD) {
             cardElement.style.cursor = 'pointer';
-            cardElement.addEventListener('click', () => addCardToDeck(cardId));
+            // Retirer l'ancien listener et ajouter le nouveau pour éviter les doublons si la fonction est appelée plusieurs fois
+            const newCardElement = cardElement.cloneNode(true); // Cloner pour supprimer les anciens listeners
+            newCardElement.addEventListener('click', (e) => {
+                // Si le clic vient de l'intérieur (ex: bouton sur la carte), ne pas ajouter au deck
+                if (e.target !== newCardElement && !newCardElement.contains(e.target)) return; 
+                addCardToDeck(cardId);
+            });
+            collectionArea.appendChild(newCardElement);
+
         } else {
-            cardElement.style.opacity = '0.5'; 
+            cardElement.style.opacity = '0.6'; 
             cardElement.style.cursor = 'not-allowed';
+            // Permettre de voir l'info même si non ajoutable
             cardElement.addEventListener('click', (e) => {
                 e.stopPropagation(); 
                 if(uiShowCardInfo) uiShowCardInfo(cardInstance, false);
             });
+            collectionArea.appendChild(cardElement);
         }
-        collectionArea.appendChild(cardElement);
     }
 }
 
@@ -122,7 +141,7 @@ function renderCurrentDeck() {
     const allCardDefinitions = getAllCards();
 
     if (userDeck.length === 0) {
-        currentDeckArea.innerHTML += '<p style="width:100%; text-align:center; color: var(--text-color-medium); padding-top: 20px;">Votre deck est vide. Cliquez sur les cartes de votre collection pour les ajouter.</p>';
+        currentDeckArea.innerHTML += '<p class="empty-zone-text">Votre deck est vide. Cliquez sur les cartes de votre collection pour les ajouter.</p>';
     }
 
     const deckCardCounts = {};
@@ -135,6 +154,10 @@ function renderCurrentDeck() {
         const cardB = allCardDefinitions.find(c => c.id === b);
         if (!cardA || !cardB) return 0;
         if (cardA.type !== cardB.type) return cardA.type.localeCompare(cardB.type);
+        const rarityOrder = { "Commun": 0, "Rare": 1, "Épique": 2, "Légendaire": 3 };
+        const rarityA = rarityOrder[cardA.rarity] ?? -1;
+        const rarityB = rarityOrder[cardB.rarity] ?? -1;
+        if (rarityA !== rarityB) return rarityB - rarityA;
         return cardA.name.localeCompare(cardB.name);
     });
 
@@ -150,31 +173,33 @@ function renderCurrentDeck() {
 
         const cardElement = uiCreateCardDOMElement({
             cardInstance: displayCardInstance,
-            owner: 'deck',
-            location: 'booster', 
+            owner: 'deck', // Contexte
+            location: 'deck', // Spécifier que c'est pour le deck
             gameState: {},
             actions: { onShowInfo: (inst) => { if(uiShowCardInfo) uiShowCardInfo(cardInstance, false); } } 
         });
         cardElement.style.cursor = 'pointer';
-        cardElement.addEventListener('click', () => removeCardFromDeck(cardId));
-        currentDeckArea.appendChild(cardElement);
+        
+        const newCardElement = cardElement.cloneNode(true);
+        newCardElement.addEventListener('click', (e) => {
+            if (e.target !== newCardElement && !newCardElement.contains(e.target)) return;
+            removeCardFromDeck(cardId);
+        });
+        currentDeckArea.appendChild(newCardElement);
     }
     if (deckCountElement) {
         deckCountElement.textContent = `${userDeck.length} / ${MAX_DECK_SIZE}`;
-        if (userDeck.length < MIN_DECK_SIZE) {
+        deckCountElement.classList.remove('count-ok', 'count-error');
+        if (userDeck.length < MIN_DECK_SIZE || userDeck.length > MAX_DECK_SIZE) {
             deckCountElement.style.color = 'var(--danger-accent)';
-        } else if (userDeck.length > MAX_DECK_SIZE) {
-            deckCountElement.style.color = 'var(--danger-accent)'; 
-        }
-        else {
+            deckCountElement.classList.add('count-error');
+        } else {
             deckCountElement.style.color = 'var(--secondary-accent)'; 
+            deckCountElement.classList.add('count-ok');
         }
     }
 }
 
-
-// --- Logique d'Ajout/Retrait du Deck (addCardToDeck, removeCardFromDeck) ---
-// ... (identiques à la version précédente)
 function addCardToDeck(cardId) {
     const countInDeck = userDeck.filter(id => id === cardId).length;
     const countInCollection = userCollection[cardId] || 0;
@@ -190,7 +215,7 @@ function addCardToDeck(cardId) {
         return;
     }
     if (countInDeck >= countInCollection) { 
-        if (uiDisplayGameMessage) uiDisplayGameMessage(`Vous n'avez plus de copies disponibles de "${cardName}" pour ajouter.`);
+        if (uiDisplayGameMessage) uiDisplayGameMessage(`Vous n'avez plus de copies disponibles de "${cardName}" dans votre collection.`);
         return;
     }
 
@@ -206,38 +231,42 @@ function removeCardFromDeck(cardIdToRemove) {
     }
 }
 
-// --- Fonction Deck Automatique (autoFillDeck) ---
-// ... (identique à la version précédente)
 function autoFillDeck() {
     if (uiDisplayGameMessage) uiDisplayGameMessage("Construction automatique du deck...", 2000);
     userDeck = []; 
 
     const allCardDefinitions = getAllCards();
-    let availableCards = []; 
+    let availableCardsForAutoDeck = []; 
 
     for (const cardId in userCollection) {
-        const count = userCollection[cardId];
-        if (count > 0) {
+        const countInCollection = userCollection[cardId];
+        if (countInCollection > 0) {
             const cardDef = allCardDefinitions.find(c => c.id === cardId);
+            // Pour l'instant, l'auto-deck se concentre sur les monstres pour simplifier
             if (cardDef && cardDef.type === "Monstre") { 
-                availableCards.push({
+                availableCardsForAutoDeck.push({
                     id: cardId,
-                    countInCollection: count,
+                    countInCollection: countInCollection,
                     isProtector: cardDef.abilities && cardDef.abilities.includes("PROTECTOR"),
-                    atk: cardDef.atk || 0 
+                    atk: cardDef.atk || 0,
+                    def: cardDef.def || 0 // Ajouter def pour potentiels tris
                 });
             }
         }
     }
 
-    if (availableCards.length === 0) {
+    if (availableCardsForAutoDeck.length === 0) {
         if (uiDisplayGameMessage) uiDisplayGameMessage("Aucun monstre dans votre collection pour créer un deck auto.", 3000);
         refreshDeckBuilderUI();
         return;
     }
 
-    const protectors = availableCards.filter(c => c.isProtector);
-    protectors.sort((a, b) => b.atk - a.atk); 
+    // Stratégie simple : Prioriser les protecteurs, puis les monstres à haute ATK
+    // Viser MIN_DECK_SIZE
+    
+    // 1. Ajouter des Protecteurs (jusqu'à MAX_COPIES_PER_CARD)
+    const protectors = availableCardsForAutoDeck.filter(c => c.isProtector);
+    protectors.sort((a, b) => b.atk - a.atk); // Les plus forts protecteurs d'abord
 
     for (const protector of protectors) {
         let copiesToAdd = Math.min(protector.countInCollection, MAX_COPIES_PER_CARD);
@@ -245,19 +274,20 @@ function autoFillDeck() {
             if (userDeck.length < MIN_DECK_SIZE) {
                 userDeck.push(protector.id);
             } else {
-                break;
+                break; // Limite MIN_DECK_SIZE atteinte
             }
         }
         if (userDeck.length >= MIN_DECK_SIZE) break;
     }
 
+    // 2. Ajouter d'autres Monstres (les plus forts en ATK d'abord)
     if (userDeck.length < MIN_DECK_SIZE) {
-        const otherMonsters = availableCards.filter(c => !c.isProtector);
+        const otherMonsters = availableCardsForAutoDeck.filter(c => !c.isProtector);
         otherMonsters.sort((a, b) => b.atk - a.atk); 
 
         for (const monster of otherMonsters) {
-            let copiesInDeck = userDeck.filter(id => id === monster.id).length;
-            let copiesToAdd = Math.min(monster.countInCollection, MAX_COPIES_PER_CARD - copiesInDeck);
+            let copiesCurrentlyInDeck = userDeck.filter(id => id === monster.id).length;
+            let copiesToAdd = Math.min(monster.countInCollection - copiesCurrentlyInDeck, MAX_COPIES_PER_CARD - copiesCurrentlyInDeck);
 
             for (let i = 0; i < copiesToAdd; i++) {
                 if (userDeck.length < MIN_DECK_SIZE) {
@@ -270,21 +300,22 @@ function autoFillDeck() {
         }
     }
     
+    // 3. Failsafe: Si toujours pas assez, ajouter aléatoirement des monstres restants (respectant MAX_COPIES)
     let failsafeIteration = 0; 
-    while (userDeck.length < MIN_DECK_SIZE && failsafeIteration < 50) {
+    const allAvailableMonstersSortedRandomly = availableCardsForAutoDeck.sort((a,b) => Math.random() - 0.5); 
+    while (userDeck.length < MIN_DECK_SIZE && failsafeIteration < 50) { // Limite d'itérations pour éviter boucle infinie
         let cardAddedInLoop = false;
-        const allAvailableMonstersSorted = availableCards.sort((a,b) => Math.random() - 0.5); 
-        for (const monster of allAvailableMonstersSorted) {
+        for (const monster of allAvailableMonstersSortedRandomly) {
             if (userDeck.length >= MIN_DECK_SIZE) break;
             
-            let copiesInDeck = userDeck.filter(id => id === monster.id).length;
-            if (copiesInDeck < monster.countInCollection && copiesInDeck < MAX_COPIES_PER_CARD) {
+            let copiesCurrentlyInDeck = userDeck.filter(id => id === monster.id).length;
+            if (copiesCurrentlyInDeck < monster.countInCollection && copiesCurrentlyInDeck < MAX_COPIES_PER_CARD) {
                 userDeck.push(monster.id);
                 cardAddedInLoop = true;
             }
         }
         failsafeIteration++;
-        if (!cardAddedInLoop && userDeck.length < MIN_DECK_SIZE) {
+        if (!cardAddedInLoop && userDeck.length < MIN_DECK_SIZE) { // Si aucune carte n'a pu être ajoutée
             if (uiDisplayGameMessage) uiDisplayGameMessage(`Impossible de compléter le deck à ${MIN_DECK_SIZE} cartes avec la collection actuelle. Deck actuel: ${userDeck.length} cartes.`, 4000);
             break; 
         }
@@ -304,7 +335,6 @@ function refreshDeckBuilderUI() {
 }
 
 export function initializeDeckBuilder(uiFuncs) {
-    // Initialiser les références DOM ici, car l'écran est maintenant visible
     deckBuilderScreen = document.getElementById('deck-builder-screen');
     collectionArea = document.getElementById('deck-builder-collection-area');
     currentDeckArea = document.getElementById('deck-builder-deck-area');
@@ -313,42 +343,35 @@ export function initializeDeckBuilder(uiFuncs) {
     backToMenuFromDeckBuilderButton = document.getElementById('back-to-menu-from-deck-builder');
     autoDeckButton = document.getElementById('deck-builder-auto-button');
 
-    // Stocker les fonctions UI passées
     uiCreateCardDOMElement = uiFuncs.createCardDOMElement;
     uiDisplayGameMessage = uiFuncs.displayGameMessage;
     uiShowScreen = uiFuncs.showScreen;
     uiShowCardInfo = uiFuncs.showCardInfo;
 
     if (!saveDeckButton || !backToMenuFromDeckBuilderButton || !autoDeckButton || !collectionArea || !currentDeckArea || !deckCountElement) {
-        console.error("DeckBuilder: Un ou plusieurs éléments DOM essentiels n'ont pas été trouvés dans initializeDeckBuilder.");
-        // Afficher un message à l'utilisateur si possible, ou retourner pour éviter d'autres erreurs.
+        console.error("DeckBuilder: Un ou plusieurs éléments DOM essentiels n'ont pas été trouvés.");
         if (uiDisplayGameMessage) uiDisplayGameMessage("Erreur: Impossible d'initialiser l'éditeur de deck. Éléments manquants.", 5000);
         return;
     }
 
     loadUserCollection();
     loadUserDeck();
-    refreshDeckBuilderUI(); // Appeler après que les éléments DOM sont assignés
+    refreshDeckBuilderUI(); 
 
-    // Utiliser une variable locale pour les boutons pour éviter de modifier les const globales
-    // et s'assurer que les listeners sont sur les bons éléments après clonage (si toujours nécessaire)
-    // Le clonage est une bonne pratique pour s'assurer de la fraîcheur du listener.
-    let currentSaveButton = saveDeckButton;
-    let currentBackButton = backToMenuFromDeckBuilderButton;
-    let currentAutoButton = autoDeckButton;
+    // S'assurer que les listeners ne sont ajoutés qu'une fois en clonant et remplaçant les boutons
+    // Ceci est une bonne pratique si initializeDeckBuilder peut être appelé plusieurs fois.
+    const newSaveButton = saveDeckButton.cloneNode(true);
+    saveDeckButton.parentNode.replaceChild(newSaveButton, saveDeckButton);
+    saveDeckButton = newSaveButton; // Réassigner à la variable globale
+    saveDeckButton.addEventListener('click', () => { if (saveUserDeck()) { /* Optionnel: action après sauvegarde réussie */ } });
 
-    const newSaveButton = currentSaveButton.cloneNode(true);
-    currentSaveButton.parentNode.replaceChild(newSaveButton, currentSaveButton);
-    newSaveButton.addEventListener('click', () => { if (saveUserDeck()) { /* ... */ } });
-    // saveDeckButton = newSaveButton; // Si vous aviez besoin de réassigner la variable globale
+    const newBackButton = backToMenuFromDeckBuilderButton.cloneNode(true);
+    backToMenuFromDeckBuilderButton.parentNode.replaceChild(newBackButton, backToMenuFromDeckBuilderButton);
+    backToMenuFromDeckBuilderButton = newBackButton;
+    backToMenuFromDeckBuilderButton.addEventListener('click', () => { if (uiShowScreen) uiShowScreen('menu'); });
 
-    const newBackButton = currentBackButton.cloneNode(true);
-    currentBackButton.parentNode.replaceChild(newBackButton, currentBackButton);
-    newBackButton.addEventListener('click', () => { if (uiShowScreen) uiShowScreen('menu'); });
-    // backToMenuFromDeckBuilderButton = newBackButton;
-
-    const newAutoDeckButton = currentAutoButton.cloneNode(true);
-    currentAutoButton.parentNode.replaceChild(newAutoDeckButton, currentAutoButton);
-    newAutoDeckButton.addEventListener('click', autoFillDeck);
-    // autoDeckButton = newAutoDeckButton;
+    const newAutoDeckButton = autoDeckButton.cloneNode(true);
+    autoDeckButton.parentNode.replaceChild(newAutoDeckButton, autoDeckButton);
+    autoDeckButton = newAutoDeckButton;
+    autoDeckButton.addEventListener('click', autoFillDeck);
 }

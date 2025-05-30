@@ -1,6 +1,6 @@
 // main.js
 import { loadCardData, getAllCards, createCardInstance as boosterCreateCardInstance } from './cardManager.js';
-import { showScreen, displayGameMessage, createCardDOMElement as uiCreateCardDOMElement, showCardInfo as uiShowCardInfo, renderBoosterOpening as uiRenderBoosterOpening } from './uiManager.js'; // Importer spécifiquement ce dont on a besoin
+import { showScreen, displayGameMessage, createCardDOMElement as uiCreateCardDOMElement, showCardInfo as uiShowCardInfo, renderBoosterOpening as uiRenderBoosterOpening } from './uiManager.js';
 import * as game from './gameLogic.js';
 import { initializeDeckBuilder, addToUserCollection, getUserDeck } from './deckBuilder.js';
 
@@ -8,9 +8,11 @@ import { initializeDeckBuilder, addToUserCollection, getUserDeck } from './deckB
 const playAiButton = document.getElementById('play-ai-button');
 const openBoosterButton = document.getElementById('open-booster-button');
 const backToMenuFromBoosterButton = document.getElementById('back-to-menu-from-booster-button');
-const openAnotherBoosterButton = document.getElementById('open-another-booster-button');
+// const openAnotherBoosterButton = document.getElementById('open-another-booster-button'); // Récupéré dynamiquement dans initializeApp
+// const boosterPackVisual = document.getElementById('booster-pack-visual'); // Récupéré dynamiquement dans initializeApp
 const quitGameButton = document.getElementById('quit-game-button');
 const deckBuilderButton = document.getElementById('deck-builder-button');
+
 
 // --- Références aux Boutons de Jeu ---
 const drawCardButton = document.getElementById('draw-card-button');
@@ -18,14 +20,27 @@ const endTurnButton = document.getElementById('end-turn-button');
 
 
 // --- Fonctions de Gestion du Menu et Booster ---
-function handleOpenBooster() {
+
+function handleOpenBoosterClick() { 
+    showScreen('booster'); 
+}
+
+function actuallyOpenBooster() { 
+    const boosterPackVis = document.getElementById('booster-pack-visual');
+    const boosterCardsDisplayArea = document.getElementById('booster-cards-area');
+
+    if (boosterPackVis) boosterPackVis.style.display = 'none';
+    if (boosterCardsDisplayArea) boosterCardsDisplayArea.style.display = 'flex';
+
     const allCardsData = getAllCards();
     if (allCardsData.length === 0) {
         displayGameMessage("Données des cartes non chargées. Veuillez patienter ou vérifier la console.");
+        const btnOpenAnother = document.getElementById('open-another-booster-button');
+        if (btnOpenAnother) btnOpenAnother.style.display = 'block';
         return;
     }
     
-    const boosterPack = []; // Contient des instances de cartes pour l'affichage
+    const boosterPack = []; 
     const boosterSize = 5; 
     
     for (let i = 0; i < boosterSize; i++) {
@@ -34,20 +49,17 @@ function handleOpenBooster() {
             const cardInstance = boosterCreateCardInstance(randomCardData.id); 
             if (cardInstance) {
                 boosterPack.push(cardInstance);
-                addToUserCollection(randomCardData.id); // Ajoute l'ID de base à la collection
+                addToUserCollection(randomCardData.id); 
             }
         }
     }
 
-    // gameState et actions pour l'affichage du booster (principalement pour onShowInfo)
     const dummyGameState = { isPlayerTurn: false, selectedPlayerCard: null, opponentField: [], playerField: [], gameIsOver: true };
     const dummyActions = { 
-        onShowInfo: (cardInst) => uiShowCardInfo(cardInst, false) // La popup ne permettra pas de jouer la carte depuis le booster
+        onShowInfo: (cardInst) => uiShowCardInfo(cardInst, false) 
     }; 
     
-    // Utiliser la fonction renderBoosterOpening de uiManager.js
     uiRenderBoosterOpening(boosterPack, dummyGameState, dummyActions);
-    showScreen('booster');
 }
 
 
@@ -75,10 +87,16 @@ async function initializeApp() {
     }
 
     if (openBoosterButton) {
-        openBoosterButton.addEventListener('click', handleOpenBooster);
+        openBoosterButton.addEventListener('click', handleOpenBoosterClick);
     }
-    if (openAnotherBoosterButton) {
-        openAnotherBoosterButton.addEventListener('click', handleOpenBooster); 
+    // Récupérer les éléments du booster ici car ils sont spécifiques à cet écran
+    const boosterPackVisualElement = document.getElementById('booster-pack-visual'); 
+    if (boosterPackVisualElement) { 
+        boosterPackVisualElement.addEventListener('click', actuallyOpenBooster);
+    }
+    const openAnotherBoosterButtonElement = document.getElementById('open-another-booster-button');
+    if (openAnotherBoosterButtonElement) {
+        openAnotherBoosterButtonElement.addEventListener('click', handleOpenBoosterClick); 
     }
     if (backToMenuFromBoosterButton) {
         backToMenuFromBoosterButton.addEventListener('click', () => showScreen('menu'));

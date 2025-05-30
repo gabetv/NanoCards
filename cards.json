@@ -6,7 +6,8 @@
     "atk": 18,
     "def": 12,
     "description": "Un jeune dragon cracheur de feu.",
-    "rarity": "Rare"
+    "rarity": "Rare",
+    "placeholderStyle": "placeholder-beast"
   },
   {
     "id": "m002",
@@ -16,7 +17,8 @@
     "def": 20,
     "description": "Un soldat loyal avec une armure épaisse. Bloque les attaques vers les objectifs.",
     "abilities": ["PROTECTOR"],
-    "rarity": "Commun"
+    "rarity": "Commun",
+    "placeholderStyle": "placeholder-protector-solid"
   },
   {
     "id": "m003",
@@ -25,7 +27,8 @@
     "atk": 15,
     "def": 8,
     "description": "Précis et mortel à distance.",
-    "rarity": "Commun"
+    "rarity": "Commun",
+    "placeholderStyle": "placeholder-beast" 
   },
   {
     "id": "m004",
@@ -35,7 +38,8 @@
     "def": 22,
     "description": "Une forteresse mobile. Bloque les attaques vers les objectifs.",
     "abilities": ["PROTECTOR"],
-    "rarity": "Rare"
+    "rarity": "Rare",
+    "placeholderStyle": "placeholder-protector-solid"
   },
   {
     "id": "m005",
@@ -44,7 +48,8 @@
     "atk": 12,
     "def": 6,
     "description": "Rapide et difficile à attraper.",
-    "rarity": "Commun"
+    "rarity": "Commun",
+    "placeholderStyle": "placeholder-aerial"
   },
   {
     "id": "m006",
@@ -54,7 +59,8 @@
     "def": 18,
     "description": "Un gardien immobile mais résistant. Bloque les attaques vers les objectifs.",
     "abilities": ["PROTECTOR"],
-    "rarity": "Commun"
+    "rarity": "Commun",
+    "placeholderStyle": "placeholder-protector-solid"
   },
   {
     "id": "m007",
@@ -63,7 +69,8 @@
     "atk": 20,
     "def": 10,
     "description": "Une créature féroce et imprévisible.",
-    "rarity": "Épique"
+    "rarity": "Épique",
+    "placeholderStyle": "placeholder-beast"
   },
   {
     "id": "s001",
@@ -71,7 +78,8 @@
     "type": "Piege",
     "description": "Lorsqu'il est détruit : Détruit le monstre attaquant.",
     "effectOnDestroy": "DESTROY_ATTACKER",
-    "rarity": "Rare"
+    "rarity": "Rare",
+    "placeholderStyle": "placeholder-trap-tech"
   },
   {
     "id": "s002",
@@ -79,7 +87,8 @@
     "type": "Piege",
     "description": "Lorsqu'il est détruit : Le propriétaire du monstre attaquant défausse une carte aléatoire de sa main.",
     "effectOnDestroy": "OPPONENT_DISCARD_RANDOM",
-    "rarity": "Commun"
+    "rarity": "Commun",
+    "placeholderStyle": "placeholder-trap-tech"
   },
   {
     "id": "s003",
@@ -87,7 +96,8 @@
     "type": "Magie",
     "description": "Lorsqu'elle est détruite : Vous piochez une carte.",
     "effectOnDestroy": "OWNER_DRAW_CARD",
-    "rarity": "Commun"
+    "rarity": "Commun",
+    "placeholderStyle": "placeholder-magic-energy"
   },
   {
     "id": "s004",
@@ -95,7 +105,8 @@
     "type": "Magie",
     "description": "Lorsqu'elle est détruite : Réduit l'ATK d'un monstre aléatoire de l'attaquant de 5 points.",
     "effectOnDestroy": "REDUCE_ATTACKER_MONSTER_ATK_5",
-    "rarity": "Rare"
+    "rarity": "Rare",
+    "placeholderStyle": "placeholder-magic-energy"
   },
   {
     "id": "s005",
@@ -103,7 +114,8 @@
     "type": "Piege",
     "description": "Lorsqu'elle est détruite : Augmente l'ATK d'un de vos monstres aléatoires de 5 points.",
     "effectOnDestroy": "BUFF_OWN_MONSTER_ATK_5",
-    "rarity": "Épique"
+    "rarity": "Épique",
+    "placeholderStyle": "placeholder-trap-tech"
   },
   {
     "id": "s006",
@@ -111,7 +123,8 @@
     "type": "Magie",
     "description": "Lorsqu'elle est détruite : Le monstre attaquant est renvoyé dans la main de son propriétaire.",
     "effectOnDestroy": "RETURN_ATTACKER_TO_HAND",
-    "rarity": "Rare"
+    "rarity": "Rare",
+    "placeholderStyle": "placeholder-magic-energy"
   },
   {
     "id": "s007",
@@ -119,7 +132,8 @@
     "type": "Piege",
     "description": "Lorsqu'elle est détruite : Le monstre attaquant ne peut pas attaquer au prochain tour de son propriétaire.",
     "effectOnDestroy": "FREEZE_ATTACKER_NEXT_TURN",
-    "rarity": "Commun"
+    "rarity": "Commun",
+    "placeholderStyle": "placeholder-trap-tech"
   },
   {
     "id": "s008",
@@ -127,6 +141,7 @@
     "type": "Magie",
     "description": "Lorsqu'elle est détruite : Vous pouvez invoquer spécialement un monstre de votre main avec ATK <= 10.",
     "effectOnDestroy": "SPECIAL_SUMMON_FROM_HAND_ATK_10",
-    "rarity": "Légendaire"
+    "rarity": "Légendaire",
+    "placeholderStyle": "placeholder-magic-energy"
   }
 ]

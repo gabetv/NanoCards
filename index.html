@@ -16,17 +16,22 @@
             <button id="deck-builder-button" class="menu-button secondary-action">Éditeur de Deck</button>
             <button id="open-booster-button" class="menu-button secondary-action">Ouvrir un Booster</button>
         </div>
-        <div class="version-info">v0.3 Alpha</div>
+        <div class="version-info">v0.4 Alpha</div> <!-- Mise à jour indicative -->
     </div>
 
     <!-- Écran d'Ouverture de Booster -->
     <div id="booster-opening-screen" class="screen">
         <button id="back-to-menu-from-booster-button" class="menu-button back-button">&larr; Menu</button>
-        <h2 class="screen-title">Contenu du Booster</h2>
-        <div id="booster-cards-area" class="area card-display-area">
-            <h2>Contenu du Booster</h2>
+        <h2 class="screen-title">Ouverture de Booster</h2>
+        
+        <div id="booster-pack-visual" class="booster-pack">
+            <span>Cliquez pour ouvrir !</span>
         </div>
-        <button id="open-another-booster-button" class="menu-button secondary-action">Ouvrir un Autre</button>
+
+        <div id="booster-cards-area" class="area card-display-area" style="display: none;">
+            {/* Les cartes du booster seront injectées ici par JavaScript */}
+        </div>
+        <button id="open-another-booster-button" class="menu-button secondary-action" style="display: none;">Ouvrir un Autre</button>
     </div>
 
     <!-- Écran de l'Éditeur de Deck -->
@@ -97,10 +102,10 @@
         <div id="popup-card-name">Nom de la Carte</div>
         <div id="popup-card-type-cost">
             <span id="popup-card-type">Type: Monstre</span>
-            <span id="popup-card-cost" style="display:none;">Coût: 3</span> {/* Assurez-vous que cet ID est utilisé par JS */}
+            <span id="popup-card-cost" style="display:none;">Coût: 3</span>
         </div>
         <div id="popup-card-stats" style="display:none;">ATK: 10 / DEF: 5</div>
-        <div id="popup-card-abilities">Capacités: Protecteur (Rareté: Commun)</div> {/* La rareté est maintenant gérée dynamiquement par JS */}
+        <div id="popup-card-abilities">Capacités: Protecteur (Rareté: Commun)</div>
         <div id="popup-card-description" class="custom-scrollbar">Description complète...</div>
         <div class="popup-actions">
             {/* Le bouton Jouer est ajouté dynamiquement par JS */}
